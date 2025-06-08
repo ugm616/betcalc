@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetCalc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #f0f0f0;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #2a2a4a;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #4CAF50;
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a2a4a;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .bet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .bet-form {
+            background: rgba(34, 34, 60, 0.8);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #4CAF50;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .bet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a3a5a;
+        }
+        
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .game-amount {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .game-amount label {
+            font-weight: bold;
+            color: #ddd;
+            white-space: nowrap;
+        }
+        
+        .game-amount input {
+            width: 100px;
+            padding: 8px 12px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.95rem;
+        }
+        
+        .odds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .odds-table th {
+            background-color: #2c2c4c;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #ddd;
+        }
+        
+        .odds-table td {
+            padding: 10px 12px;
+            background-color: rgba(42, 42, 72, 0.6);
+            border-bottom: 1px solid #3a3a5a;
+        }
+        
+        .team-name-cell {
+            width: 25%;
+        }
+        
+        .team-name-input {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .team-name-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        
+        .odds-input {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .odds-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #f44336, #D32F2F);
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            border: 1px solid #2a2a4a;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .modal-message {
+            color: #ddd;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .results-container {
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid #2a2a4a;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .results-title {
+            font-size: 1.4rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a3a5a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bet-result {
+            background: rgba(34, 34, 60, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid #4CAF50;
+        }
+        
+        .result-header {
+            color: #4CAF50;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: rgba(42, 42, 72, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .scenario {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(42, 42, 72, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid #2196F3;
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2196F3;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .highlight {
+            background-color: rgba(76, 175, 80, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .remove-bet {
+            margin-top: 10px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 0.85rem;
+            padding: 20px;
+            border-top: 1px solid #3a3a5a;
+        }
+        
+        @media (max-width: 768px) {
+            .bet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-container {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> BetCalc</h1>
+            <p class="subtitle">Optimize your Bets</p>
+        </header>
+        
+        <div class="controls">
+            <div class="btn-container">
+                <button id="add-bet" class="btn-secondary">
+                    <i class="fas fa-plus-circle"></i> Add Game
+                </button>
+                <button id="calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Calculate Strategy
+                </button>
+            </div>
+        </div>
+        
+        <div class="bet-grid" id="bet-forms">
+            <!-- Bet forms will be added here -->
+        </div>
+            
+        <div id="results" class="results-container">
+            <h2 class="results-title"><i class="fas fa-chart-line"></i> Optimal Betting Strategy</h2>
+            <div id="results-content">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+        
+        <footer>
+            <p>BetCalc</p>
+        </footer>
+    </div>
+    
+    <!-- Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-check-circle"></i> Confirm Calculation</h3>
+            </div>
+            <p class="modal-message">Are you sure you want to calculate the betting strategy with the current odds? You can go back to adjust if needed.</p>
+            <div class="modal-buttons">
+                <button id="confirm-calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Yes, Calculate
+                </button>
+                <button id="cancel-calculate" class="btn-danger">
+                    <i class="fas fa-times"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const betForms = document.getElementById('bet-forms');
+            const addBetBtn = document.getElementById('add-bet');
+            const calculateBtn = document.getElementById('calculate');
+            const modal = document.getElementById('confirmation-modal');
+            const confirmBtn = document.getElementById('confirm-calculate');
+            const cancelBtn = document.getElementById('cancel-calculate');
+            const resultsContainer = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            
+            // Create initial bet form
+            createBetForm(1);
+            
+            // Add new bet form
+            addBetBtn.addEventListener('click', function() {
+                const formCount = document.querySelectorAll('.bet-form').length + 1;
+                createBetForm(formCount);
+            });
+            
+            // Show confirmation modal
+            calculateBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            // Cancel calculation
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Confirm calculation
+            confirmBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                calculateStrategy();
+            });
+            
+            // Create a bet form
+            function createBetForm(index) {
+                const betForm = document.createElement('div');
+                betForm.className = 'bet-form';
+                betForm.innerHTML = `
+                    <div class="bet-header">
+                        <div class="game-title">
+                            <i class="fas fa-hockey-puck"></i> Game #${index}
+                        </div>
+                    </div>
+                    
+                    <div class="game-amount">
+                        <label for="game-amount-${index}">Amount to Bet (£):</label>
+                        <input type="number" id="game-amount-${index}" min="1" value="10">
+                    </div>
+                    
+                    <table class="odds-table">
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>Bet1 Odds</th>
+                                <th>Bet2 Odds</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="team-name-cell">
+                                    <input type="text" class="team-name-input" value="TeamA" placeholder="Enter team name">
+                                </td>
+                                <td><input type="text" class="odds-input bet1-teamA" placeholder="e.g., 2/1"></td>
+                                <td><input type="text" class="odds-input bet2-teamA" placeholder="e.g., 2/1"></td>
+                            </tr>
+                            <tr>
+                                <td class="team-name-cell">
+                                    <input type="text" class="team-name-input" value="TeamB" placeholder="Enter team name">
+                                </td>
+                                <td><input type="text" class="odds-input bet1-teamB" placeholder="e.g., 4/1"></td>
+                                <td><input type="text" class="odds-input bet2-teamB" placeholder="e.g., 3/1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-danger remove-bet">
+                        <i class="fas fa-trash-alt"></i> Remove Game
+                    </button>
+                `;
+                betForms.appendChild(betForm);
+                
+                // Add event listener to remove button
+                betForm.querySelector('.remove-bet').addEventListener('click', function() {
+                    if (document.querySelectorAll('.bet-form').length > 1) {
+                        betForm.remove();
+                        // Update game numbers
+                        document.querySelectorAll('.bet-form').forEach((form, idx) => {
+                            const title = form.querySelector('.game-title');
+                            if (title) {
+                                title.innerHTML = `<i class="fas fa-hockey-puck"></i> Game #${idx + 1}`;
+                            }
+                        });
+                    } else {
+                        alert('You need at least one game!');
+                    }
+                });
+            }
+            
+            // Calculate the optimal betting strategy
+            function calculateStrategy() {
+                const betForms = document.querySelectorAll('.bet-form');
+                let resultsHTML = '';
+                
+                betForms.forEach((form, index) => {
+                    // Get amount for this game
+                    const amountInput = form.querySelector(`#game-amount-${index+1}`);
+                    const totalAmount = amountInput ? parseFloat(amountInput.value) : 10;
+                    
+                    // Get team names
+                    const teamNameInputs = form.querySelectorAll('.team-name-input');
+                    const teamA = teamNameInputs[0].value || 'TeamA';
+                    const teamB = teamNameInputs[1].value || 'TeamB';
+                    
+                    // Get input values
+                    const bet1TeamA = form.querySelector('.bet1-teamA').value;
+                    const bet2TeamA = form.querySelector('.bet2-teamA').value;
+                    const bet1TeamB = form.querySelector('.bet1-teamB').value;
+                    const bet2TeamB = form.querySelector('.bet2-teamB').value;
+                    
+                    // Validate inputs
+                    if (!bet1TeamA || !bet2TeamA || !bet1TeamB || !bet2TeamB) {
+                        resultsHTML += `
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> Game #${index + 1} Error
+                                </div>
+                                <p>Please enter valid odds for all fields</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Parse odds
+                    let a1, b1, c1, d1, a2, b2, c2, d2;
+                    
+                    try {
+                        [a1, b1] = bet1TeamA.split('/').map(Number);
+                        [c1, d1] = bet1TeamB.split('/').map(Number);
+                        [a2, b2] = bet2TeamA.split('/').map(Number);
+                        [c2, d2] = bet2TeamB.split('/').map(Number);
+                    } catch (e) {
+                        resultsHTML += `
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> Game #${index + 1} Error
+                                </div>
+                                <p>Invalid odds format. Please use the format "2/1"</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Calculate profit multipliers
+                    const alpha1 = a1 / b1;
+                    const beta1 = c1 / d1;
+                    const alpha2 = a2 / b2;
+                    const beta2 = c2 / d2;
+                    
+                    // Calculate stakes and profits for both options
+                    const x1 = (beta2 * totalAmount) / (beta2 + 1);
+                    const y1 = totalAmount - x1;
+                    const p1 = (alpha1 + 1) * x1 - totalAmount;
+                    
+                    const x2 = (beta1 * totalAmount) / (beta1 + 1);
+                    const y2 = totalAmount - x2;
+                    const p2 = (alpha2 + 1) * x2 - totalAmount;
+                    
+                    // Determine optimal strategy
+                    let strategy, stakeA, stakeB, bookmakerA, bookmakerB, profitA, profitB;
+                    
+                    if (p2 >= p1) {
+                        strategy = `${teamA} at Bet2 and ${teamB} at Bet1`;
+                        stakeA = x2.toFixed(2);
+                        stakeB = y2.toFixed(2);
+                        bookmakerA = "Bet2";
+                        bookmakerB = "Bet1";
+                        profitA = p2.toFixed(2);
+                        profitB = 0;
+                    } else {
+                        strategy = `${teamA} at Bet1 and ${teamB} at Bet2`;
+                        stakeA = x1.toFixed(2);
+                        stakeB = y1.toFixed(2);
+                        bookmakerA = "Bet1";
+                        bookmakerB = "Bet2";
+                        profitA = p1.toFixed(2);
+                        profitB = 0;
+                    }
+                    
+                    // Generate results HTML for this game
+                    resultsHTML += `
+                        <div class="bet-result">
+                            <div class="result-header">
+                                <i class="fas fa-trophy"></i> Game #${index + 1} Strategy
+                            </div>
+                            <p>Optimal approach: <span class="highlight">${strategy}</span></p>
+                            <p>Total amount: <span class="highlight">£${totalAmount}</span></p>
+                            
+                            <div class="result-details">
+                                <div class="result-box">
+                                    <div class="result-label">Stake on ${teamA}</div>
+                                    <div class="result-value">£${stakeA}</div>
+                                    <div class="result-label">at ${bookmakerA}</div>
+                                </div>
+                                
+                                <div class="result-box">
+                                    <div class="result-label">Stake on ${teamB}</div>
+                                    <div class="result-value">£${stakeB}</div>
+                                    <div class="result-label">at ${bookmakerB}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="scenario">
+                                <div class="scenario-title">
+                                    <i class="fas fa-check-circle"></i> If ${teamA} wins:
+                                </div>
+                                <p>Profit = £${stakeA} × ${a1}/${b1} - £${stakeB} = <span class="highlight">£${profitA}</span></p>
+                            </div>
+                            
+                            <div class="scenario">
+                                <div class="scenario-title">
+                                    <i class="fas fa-check-circle"></i> If ${teamB} wins:
+                                </div>
+                                <p>Profit = £${stakeB} × ${c1}/${d1} - £${stakeA} = <span class="highlight">£${profitB}</span> (break even)</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // Display results
+                resultsContent.innerHTML = resultsHTML;
+                resultsContainer.style.display = 'block';
+                
+                // Scroll to results
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
