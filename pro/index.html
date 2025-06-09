@@ -276,20 +276,8 @@
             gap: 5px;
             margin-top: 5px;
         }
-        
         .add-team-row {
-            text-align: center;
-            padding: 10px;
-            border: 1px dashed var(--border-color);
-            border-radius: 5px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .add-team-row:hover {
-            background-color: rgba(76, 175, 80, 0.1);
-            border-color: var(--primary-color);
+            display: none; /* Hide the add team row since we only need 2 teams */
         }
         
         .results-container {
@@ -378,6 +366,21 @@
             border-radius: 4px;
             color: var(--primary-color);
             font-weight: bold;
+        }
+        
+        .highlight.break-even {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .strategy-type {
+            font-size: 0.9rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: inline-block;
         }
         
         .modal {
@@ -469,6 +472,90 @@
             opacity: 1;
         }
         
+        /* New styles for the bookmaker title */
+        .bookmaker-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .bookmaker-title span {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .remove-bookmaker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 10px;
+            background: var(--danger-color);
+        }
+        
+        /* New styles for comparison matrix */
+        .comparison-matrix {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .comparison-matrix h4 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .matrix-cell {
+            background: rgba(42, 42, 72, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .combination-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .combination-status {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .combination-status.profitable {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .combination-status.not-profitable {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .combination-status.pending {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .team-name {
+            width: 100%;
+        }
+        
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -528,10 +615,9 @@
         </div>
         
         <footer>
-            <p>BetCalc Pro &copy; 2025</p>
+            <p>BetCalc Pro 2025</p>
         </footer>
     </div>
-    
     <!-- Modal -->
     <div id="confirmation-modal" class="modal">
         <div class="modal-content">
@@ -639,7 +725,7 @@
                             <tbody>
                                 <tr>
                                     <td class="team-cell">
-                                        <input type="text" value="Team A" placeholder="Team name">
+                                        <input type="text" class="team-name" value="Team A" placeholder="Team name">
                                     </td>
                                     <td>
                                         <input type="text" class="odds-input" placeholder="e.g., 2/1">
@@ -651,7 +737,7 @@
                                 </tr>
                                 <tr>
                                     <td class="team-cell">
-                                        <input type="text" value="Team B" placeholder="Team name">
+                                        <input type="text" class="team-name" value="Team B" placeholder="Team name">
                                     </td>
                                     <td>
                                         <input type="text" class="odds-input" placeholder="e.g., 4/1">
@@ -664,13 +750,12 @@
                             </tbody>
                         </table>
                     </div>
-                    
-                    <div class="add-team-row" data-game="${gameId}">
-                        <i class="fas fa-plus-circle"></i> Add Team
-                    </div>
                 `;
                 
                 gamesContainer.appendChild(gameElement);
+
+                // Create comparison matrix container for this game
+                createComparisonMatrix(gameId);
                 
                 // Add event listener to remove game button
                 const removeGameBtn = gameElement.querySelector('.remove-game');
@@ -688,262 +773,563 @@
                     addBookmaker(gameId);
                 });
                 
-                // Add event listener to add team row
-                const addTeamRow = gameElement.querySelector('.add-team-row');
-                addTeamRow.addEventListener('click', function() {
-                    addTeam(gameId);
-                });
-                
                 // Add event listeners to remove bookmaker buttons
                 setupRemoveBookmakerButtons(gameId);
             }
             
             // Add a new bookmaker column
-function addBookmaker(gameId) {
-    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
-    if (!spreadsheet) return;
-    
-    // Get the current number of bookmaker columns
-    const headerRow = spreadsheet.querySelector('thead tr');
-    const bookmakerCount = headerRow.querySelectorAll('th').length - 1; // Subtract 1 for the team column
-    const newBookmakerNum = bookmakerCount + 1;
-    
-    // Add header for the new bookmaker column
-    const newHeader = document.createElement('th');
-    newHeader.className = 'bookmaker-header';
-    newHeader.innerHTML = `
-        <div class="bookmaker-title">
-            <span contenteditable="true">Bet${newBookmakerNum}</span>
-            <button class="remove-bookmaker" title="Remove this bookmaker">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    headerRow.appendChild(newHeader);
-    
-    // Add odds cells for each team
-    const teamRows = spreadsheet.querySelectorAll('tbody tr');
-    teamRows.forEach((row, teamIndex) => {
-        const teamName = row.querySelector('.team-name-input').value || `Team${String.fromCharCode(65 + teamIndex)}`;
-        const newCell = document.createElement('td');
-        newCell.innerHTML = `<input type="text" class="odds-input bet${newBookmakerNum}-${teamName}" placeholder="e.g., 2/1">`;
-        row.appendChild(newCell);
-    });
-    
-    // Add event listener to remove button
-    const removeBtn = newHeader.querySelector('.remove-bookmaker');
-    removeBtn.addEventListener('click', function() {
-        if (bookmakerCount > 2) { // Keep at least 2 bookmakers
-            // Remove header
-            headerRow.removeChild(newHeader);
-            
-            // Remove corresponding cells from each row
-            teamRows.forEach(row => {
-                row.removeChild(row.cells[bookmakerCount]);
-            });
-            
-            // Update calculation logic to account for removed bookmaker
-            updateCalculationCapabilities(gameId);
-        } else {
-            alert('You need at least two bookmakers for comparison!');
-        }
-    });
-    
-    // Update calculation logic to include the new bookmaker
-    updateCalculationCapabilities(gameId);
-}
-
-// Update calculation capabilities when bookmakers change
-function updateCalculationCapabilities(gameId) {
-    // Get all current bookmakers for this game
-    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
-    const bookmakerHeaders = spreadsheet.querySelectorAll('.bookmaker-header');
-    const bookmakerNames = [];
-    
-    bookmakerHeaders.forEach(header => {
-        const nameElement = header.querySelector('.bookmaker-title span');
-        bookmakerNames.push(nameElement.textContent.trim());
-    });
-    
-    // Update the calculation algorithm to handle variable number of bookmakers
-    const calculationLogic = document.getElementById(`calculation-logic-${gameId}`);
-    if (calculationLogic) {
-        calculationLogic.setAttribute('data-bookmakers', JSON.stringify(bookmakerNames));
-    }
-    
-    // Update the UI to show all possible combinations
-    updateComparisonMatrix(gameId, bookmakerNames);
-}
-
-// Update the comparison matrix showing all possible bookmaker combinations
-function updateComparisonMatrix(gameId, bookmakerNames) {
-    const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
-    if (!matrixContainer) return;
-    
-    let matrixHTML = '<h4>Potential Arbitrage Combinations</h4>';
-    matrixHTML += '<div class="matrix-grid">';
-    
-    // Create a grid showing all possible combinations of bookmakers
-    for (let i = 0; i < bookmakerNames.length; i++) {
-        for (let j = i + 1; j < bookmakerNames.length; j++) {
-            matrixHTML += `
-                <div class="matrix-cell" data-combination="${bookmakerNames[i]}-${bookmakerNames[j]}">
-                    <div class="combination-title">${bookmakerNames[i]} vs ${bookmakerNames[j]}</div>
-                    <div class="combination-status pending">
-                        <i class="fas fa-question-circle"></i> Pending calculation
+            function addBookmaker(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                // Get the current number of bookmaker columns
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // Subtract 1 for the add button
+                const newBookmakerNum = bookmakerCount + 1;
+                
+                // Create new header for the bookmaker column
+                const newHeader = document.createElement('th');
+                newHeader.className = 'bookmaker-header';
+                newHeader.innerHTML = `
+                    <input type="text" class="bookmaker-name" value="Bookmaker ${newBookmakerNum}" placeholder="Bookmaker name">
+                    <div class="bookmaker-actions">
+                        <button class="btn-danger remove-row-btn" title="Remove bookmaker">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
-                    <button class="calculate-specific" data-bookie1="${bookmakerNames[i]}" data-bookie2="${bookmakerNames[j]}">
-                        <i class="fas fa-calculator"></i> Calculate
-                    </button>
-                </div>
-            `;
-        }
+                `;
+                
+                // Insert the new header before the add button column
+                const addBtnColumn = headerRow.querySelector('th:last-child');
+                headerRow.insertBefore(newHeader, addBtnColumn);
+                
+                // Add cells for each team row
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                teamRows.forEach(row => {
+                    const newCell = document.createElement('td');
+                    newCell.innerHTML = `<input type="text" class="odds-input" placeholder="e.g., 2/1">`;
+                    
+                    // Insert before the empty cell
+                    const lastCell = row.querySelector('td:last-child');
+                    row.insertBefore(newCell, lastCell);
+                });
+                
+                // Setup event listeners for the new remove button
+                setupRemoveBookmakerButtons(gameId);
+                
+                // Update the comparison matrix
+                updateBookmakerComparison(gameId);
+            }
+
+            // Set up remove bookmaker buttons
+            function setupRemoveBookmakerButtons(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const removeButtons = spreadsheet.querySelectorAll('.remove-row-btn');
+                removeButtons.forEach(button => {
+                    // Clear existing event listeners
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+                    
+                    newButton.addEventListener('click', function() {
+                        const headerRow = spreadsheet.querySelector('thead tr');
+                        const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // -1 for add button
+                        
+                        if (bookmakerCount > 2) { // Keep at least 2 bookmakers
+                            // Find the index of this bookmaker column
+                            const th = this.closest('th');
+                            const columnIndex = Array.from(headerRow.children).indexOf(th);
+                            
+                            // Remove this column from all rows
+                            const allRows = spreadsheet.querySelectorAll('tr');
+                            allRows.forEach(row => {
+                                if (row.cells[columnIndex]) {
+                                    row.removeChild(row.cells[columnIndex]);
+                                }
+                            });
+                            
+                            // Update buttons state and comparison matrix
+                            updateRemoveButtonsState(gameId);
+                            updateBookmakerComparison(gameId);
+                        } else {
+                            alert('You need at least two bookmakers for comparison!');
+                        }
+                    });
+                });
+                
+                updateRemoveButtonsState(gameId);
+            }
+            
+            // Update state of remove buttons
+            function updateRemoveButtonsState(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // -1 for add button
+                const removeButtons = spreadsheet.querySelectorAll('.remove-row-btn');
+                
+                removeButtons.forEach(button => {
+                    if (bookmakerCount <= 2) {
+                        button.disabled = true;
+                    } else {
+                        button.disabled = false;
+                    }
+                });
+            }
+	
+	            // Create comparison matrix container
+            function createComparisonMatrix(gameId) {
+                const gameElement = document.getElementById(gameId);
+                if (!gameElement) return;
+                
+                // Check if matrix already exists
+                if (gameElement.querySelector(`#comparison-matrix-${gameId}`)) return;
+                
+                // Create matrix container
+                const matrixContainer = document.createElement('div');
+                matrixContainer.id = `comparison-matrix-${gameId}`;
+                matrixContainer.className = 'comparison-matrix';
+                
+                // Add after the spreadsheet container
+                const spreadsheetContainer = gameElement.querySelector('.spreadsheet-container');
+                if (spreadsheetContainer) {
+                    spreadsheetContainer.insertAdjacentElement('afterend', matrixContainer);
+                } else {
+                    gameElement.appendChild(matrixContainer);
+                }
+                
+                // Update the content
+                updateBookmakerComparison(gameId);
+                
+                return matrixContainer;
+            }
+            
+            // Update bookmaker comparison matrix
+            function updateBookmakerComparison(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
+                
+                if (!spreadsheet || !matrixContainer) return;
+                
+                // Get bookmaker names
+                const bookmakerNames = [];
+                const bookmakerInputs = spreadsheet.querySelectorAll('.bookmaker-name');
+                bookmakerInputs.forEach(input => {
+                    if (input.value.trim()) {
+                        bookmakerNames.push(input.value.trim());
+                    }
+                });
+                
+                // Generate matrix HTML
+                let matrixHTML = '<h4>Potential Risk-Minimizing Combinations</h4>';
+                matrixHTML += '<div class="matrix-grid">';
+                
+                // Generate all possible combinations
+                for (let i = 0; i < bookmakerNames.length; i++) {
+                    for (let j = i + 1; j < bookmakerNames.length; j++) {
+                        const bookie1 = bookmakerNames[i];
+                        const bookie2 = bookmakerNames[j];
+                        
+                        matrixHTML += `
+                            <div class="matrix-cell" data-combination="${bookie1}-${bookie2}">
+                                <div class="combination-title">${bookie1} vs ${bookie2}</div>
+                                <div class="combination-status pending">
+                                    <i class="fas fa-question-circle"></i> Pending calculation
+                                </div>
+                                <button class="btn-secondary calculate-specific" data-bookie1="${bookie1}" data-bookie2="${bookie2}">
+                                    <i class="fas fa-calculator"></i> Calculate
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+                
+                matrixHTML += '</div>';
+                matrixContainer.innerHTML = matrixHTML;
+                
+                // Add event listeners to calculation buttons
+                const calcButtons = matrixContainer.querySelectorAll('.calculate-specific');
+                calcButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const bookie1 = this.getAttribute('data-bookie1');
+                        const bookie2 = this.getAttribute('data-bookie2');
+                        calculateSpecificCombination(gameId, bookie1, bookie2);
+                    });
+                });
+            }
+            
+            // Calculate specific bookmaker combination
+            function calculateSpecificCombination(gameId, bookie1, bookie2) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const amountInput = document.getElementById(`amount-${gameId}`);
+                const totalAmount = amountInput ? parseFloat(amountInput.value) : 100;
+                
+                // Get team names and their odds for these bookmakers
+                const teams = [];
+                const odds = {};
+                
+                // Find indices of the bookmaker columns
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const headers = Array.from(headerRow.querySelectorAll('th'));
+                const bookieIndices = {};
+                
+                headers.forEach((th, index) => {
+                    const nameInput = th.querySelector('.bookmaker-name');
+                    if (nameInput) {
+                        const bookieName = nameInput.value.trim();
+                        if (bookieName === bookie1 || bookieName === bookie2) {
+                            bookieIndices[bookieName] = index;
+                        }
+                    }
+                });
+                
+                // If we couldn't find the bookmakers, return
+                if (!bookieIndices[bookie1] || !bookieIndices[bookie2]) {
+                    console.error('Could not find bookmaker columns');
+                    return;
+                }
+                
+                // Get team names and odds
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                teamRows.forEach(row => {
+                    const teamNameInput = row.querySelector('.team-name');
+                    if (!teamNameInput) return;
+                    
+                    const teamName = teamNameInput.value.trim() || 'Unnamed Team';
+                    teams.push(teamName);
+                    
+                    odds[teamName] = {
+                        [bookie1]: row.cells[bookieIndices[bookie1]].querySelector('input').value,
+                        [bookie2]: row.cells[bookieIndices[bookie2]].querySelector('input').value
+                    };
+                });
+                
+                // Perform the risk-minimizing calculation
+                const result = performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount);
+                
+                // Update the UI with the result
+                const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
+                if (!matrixContainer) return;
+                
+                const matrixCell = matrixContainer.querySelector(`[data-combination="${bookie1}-${bookie2}"]`);
+                if (!matrixCell) return;
+                
+                const statusDiv = matrixCell.querySelector('.combination-status');
+                if (!statusDiv) return;
+                
+                if (result.isProfitable) {
+                    statusDiv.className = 'combination-status profitable';
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> 
+                        Profit on ${result.stableTeam}: £${result.expectedProfit.toFixed(2)}
+                    `;
+                } else {
+                    statusDiv.className = 'combination-status not-profitable';
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-times-circle"></i>
+                        No viable strategy
+                    `;
+                }
+                
+                return result;
+            }
+            
+            // Perform risk-minimizing calculation correctly adapted from the original working version
+function performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount) {
+    if (!teams || !odds || teams.length < 2) {
+        return { isProfitable: false, error: 'Invalid teams data' };
     }
     
-    matrixHTML += '</div>';
-    matrixContainer.innerHTML = matrixHTML;
+    const teamA = teams[0];
+    const teamB = teams[1];
     
-    // Add event listeners to the individual calculation buttons
-    const calcButtons = matrixContainer.querySelectorAll('.calculate-specific');
-    calcButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const bookie1 = this.getAttribute('data-bookie1');
-            const bookie2 = this.getAttribute('data-bookie2');
-            calculateSpecificCombination(gameId, bookie1, bookie2);
-        });
-    });
-}
-
-// Calculate specific bookmaker combination
-function calculateSpecificCombination(gameId, bookie1, bookie2) {
-    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
-    const amountInput = document.getElementById(`game-amount-${gameId}`);
-    const totalAmount = amountInput ? parseFloat(amountInput.value) : 10;
+    // Parse odds for each team/bookmaker combination
+    let oddsA1, oddsA2, oddsB1, oddsB2;
     
-    // Get team names
-    const teamRows = spreadsheet.querySelectorAll('tbody tr');
-    const teamNames = Array.from(teamRows).map(row => {
-        return row.querySelector('.team-name-input').value || 'Team';
-    });
-    
-    // Get odds for specific bookmakers
-    let odds = {};
-    teamNames.forEach((team, index) => {
-        odds[team] = {
-            [bookie1]: spreadsheet.querySelector(`.bet${bookie1.replace(/[^0-9]/g, '')}-${team}`).value,
-            [bookie2]: spreadsheet.querySelector(`.bet${bookie2.replace(/[^0-9]/g, '')}-${team}`).value
-        };
-    });
-    
-    // Perform calculation
-    const result = performArbitrageCalculation(teamNames, odds, bookie1, bookie2, totalAmount);
-    
-    // Update the matrix cell with the result
-    const matrixCell = document.querySelector(`#comparison-matrix-${gameId} [data-combination="${bookie1}-${bookie2}"]`);
-    if (matrixCell && result) {
-        const statusDiv = matrixCell.querySelector('.combination-status');
-        
-        if (result.isProfitable) {
-            statusDiv.className = 'combination-status profitable';
-            statusDiv.innerHTML = `
-                <i class="fas fa-check-circle"></i> 
-                Profitable: £${result.expectedProfit.toFixed(2)}
-            `;
-        } else {
-            statusDiv.className = 'combination-status not-profitable';
-            statusDiv.innerHTML = `
-                <i class="fas fa-times-circle"></i>
-                Not profitable
-            `;
-        }
-    }
-}
-
-// Perform the actual arbitrage calculation
-function performArbitrageCalculation(teamNames, odds, bookie1, bookie2, totalAmount) {
-    // Parse odds
-    let parsedOdds = {};
     try {
-        teamNames.forEach(team => {
-            parsedOdds[team] = {
-                [bookie1]: parseOdds(odds[team][bookie1]),
-                [bookie2]: parseOdds(odds[team][bookie2])
-            };
-        });
+        // Parse odds to decimal multipliers
+        oddsA1 = parseOdds(odds[teamA][bookie1]); // Team A at bookie1
+        oddsA2 = parseOdds(odds[teamA][bookie2]); // Team A at bookie2
+        oddsB1 = parseOdds(odds[teamB][bookie1]); // Team B at bookie1
+        oddsB2 = parseOdds(odds[teamB][bookie2]); // Team B at bookie2
     } catch (e) {
+        console.error("Error parsing odds:", e);
         return { isProfitable: false, error: 'Invalid odds format' };
     }
     
-    // Calculate optimal stakes and expected profit
-    let bestCombination = { isProfitable: false, expectedProfit: 0 };
+    // Calculate stakes and profits for both options
+    // Option 1: TeamA with bookie1, TeamB with bookie2
+    const stakeA1 = (oddsB2 * totalAmount) / (oddsB2 + 1);
+    const stakeB2 = totalAmount - stakeA1;
+    const profitIfA1Wins = (oddsA1 + 1) * stakeA1 - totalAmount;
+    const profitIfB2Wins = (oddsB2 + 1) * stakeB2 - totalAmount;
     
-    // Compare all possible combinations of bookmakers for each team
-    let combinations = [];
-    teamNames.forEach(teamA => {
-        teamNames.forEach(teamB => {
-            if (teamA === teamB) return;
-            
-            // Try teamA with bookie1, teamB with bookie2
-            combinations.push({
-                [teamA]: { bookie: bookie1, odds: parsedOdds[teamA][bookie1] },
-                [teamB]: { bookie: bookie2, odds: parsedOdds[teamB][bookie2] }
-            });
-            
-            // Try teamA with bookie2, teamB with bookie1
-            combinations.push({
-                [teamA]: { bookie: bookie2, odds: parsedOdds[teamA][bookie2] },
-                [teamB]: { bookie: bookie1, odds: parsedOdds[teamB][bookie1] }
-            });
-        });
-    });
+    // Option 2: TeamA with bookie2, TeamB with bookie1
+    const stakeA2 = (oddsB1 * totalAmount) / (oddsB1 + 1);
+    const stakeB1 = totalAmount - stakeA2;
+    const profitIfA2Wins = (oddsA2 + 1) * stakeA2 - totalAmount;
+    const profitIfB1Wins = (oddsB1 + 1) * stakeB1 - totalAmount;
     
-    // Find the best combination
-    combinations.forEach(combo => {
-        const teams = Object.keys(combo);
-        if (teams.length < 2) return;
-        
-        const teamA = teams[0];
-        const teamB = teams[1];
-        
-        const alpha = combo[teamA].odds;
-        const beta = combo[teamB].odds;
-        
-        // Calculate optimal stake distribution
-        const x = (beta * totalAmount) / (beta + 1);
-        const y = totalAmount - x;
-        const expectedProfit = (alpha + 1) * x - totalAmount;
-        
-        if (expectedProfit > bestCombination.expectedProfit) {
-            bestCombination = {
-                isProfitable: expectedProfit > 0,
-                expectedProfit: expectedProfit,
-                stakes: {
-                    [teamA]: { amount: x, bookie: combo[teamA].bookie },
-                    [teamB]: { amount: y, bookie: combo[teamB].bookie }
+    // Determine which option is better (higher profit for the stable team)
+    if (profitIfA1Wins >= profitIfA2Wins) {
+        return {
+            isProfitable: true,
+            expectedProfit: profitIfA1Wins,
+            stableTeam: teamA,
+            stableBookie: bookie1,
+            stableOdds: oddsA1,
+            stableStake: stakeA1,
+            riskierTeam: teamB,
+            riskierBookie: bookie2,
+            riskierOdds: oddsB2,
+            riskierStake: stakeB2,
+            riskierResult: profitIfB2Wins
+        };
+    } else {
+        return {
+            isProfitable: true,
+            expectedProfit: profitIfA2Wins,
+            stableTeam: teamA,
+            stableBookie: bookie2,
+            stableOdds: oddsA2,
+            stableStake: stakeA2,
+            riskierTeam: teamB,
+            riskierBookie: bookie1,
+            riskierOdds: oddsB1,
+            riskierStake: stakeB1,
+            riskierResult: profitIfB1Wins
+        };
+    }
+}
+	
+	            // Helper function to parse odds in various formats
+            function parseOdds(oddsString) {
+                if (!oddsString || typeof oddsString !== 'string') return 0;
+                
+                oddsString = oddsString.trim();
+                
+                // Handle fractional odds (e.g., "2/1")
+                if (oddsString.includes('/')) {
+                    const [a, b] = oddsString.split('/').map(Number);
+                    if (isNaN(a) || isNaN(b) || b === 0) return 0;
+                    return a / b;
                 }
-            };
+                
+                // Handle decimal odds (e.g., "3.0")
+                const decimalOdds = parseFloat(oddsString);
+                if (!isNaN(decimalOdds)) {
+                    return decimalOdds - 1; // Convert to profit multiplier
+                }
+                
+                return 0;
+            }
+            
+            // Calculate the optimal risk-minimizing betting strategy for all games
+function calculateStrategy() {
+    const gameContainers = document.querySelectorAll('.game-container');
+    const resultsHTML = [];
+    
+    // Process each game
+    gameContainers.forEach(gameContainer => {
+        const gameId = gameContainer.id;
+        const gameTitle = gameContainer.querySelector('.game-title').textContent.trim();
+        const amountInput = gameContainer.querySelector('input[type="number"]');
+        const totalAmount = amountInput ? parseFloat(amountInput.value) : 100;
+        
+        const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+        if (!spreadsheet) return;
+        
+        // Get bookmakers
+        const bookmakers = [];
+        const bookmakerInputs = spreadsheet.querySelectorAll('.bookmaker-name');
+        bookmakerInputs.forEach(input => {
+            if (input.value.trim()) {
+                bookmakers.push(input.value.trim());
+            }
+        });
+        
+        // Get teams
+        const teams = [];
+        const teamRows = spreadsheet.querySelectorAll('tbody tr');
+        teamRows.forEach(row => {
+            const teamNameInput = row.querySelector('.team-name');
+            if (teamNameInput && teamNameInput.value.trim()) {
+                teams.push(teamNameInput.value.trim());
+            }
+        });
+        
+        if (teams.length < 2 || bookmakers.length < 2) {
+            resultsHTML.push(`
+                <div class="bet-result">
+                    <div class="result-header">
+                        <i class="fas fa-exclamation-triangle"></i> ${gameTitle} - Error
+                    </div>
+                    <p>You need at least 2 teams and 2 bookmakers to calculate a strategy.</p>
+                </div>
+            `);
+            return;
+        }
+        
+        // Find the best combination across all bookmakers
+        let bestResult = null;
+        
+        // Try all bookmaker combinations
+        for (let i = 0; i < bookmakers.length; i++) {
+            for (let j = i + 1; j < bookmakers.length; j++) {
+                const bookie1 = bookmakers[i];
+                const bookie2 = bookmakers[j];
+                
+                // Get odds for these bookmakers
+                const odds = {};
+                teams.forEach(team => {
+                    odds[team] = {};
+                    
+                    // Find bookmaker columns
+                    const headerRow = spreadsheet.querySelector('thead tr');
+                    const headers = Array.from(headerRow.querySelectorAll('th'));
+                    let bookie1Index = -1;
+                    let bookie2Index = -1;
+                    
+                    headers.forEach((th, index) => {
+                        const nameInput = th.querySelector('.bookmaker-name');
+                        if (nameInput) {
+                            if (nameInput.value.trim() === bookie1) bookie1Index = index;
+                            if (nameInput.value.trim() === bookie2) bookie2Index = index;
+                        }
+                    });
+                    
+                    // Find the team row
+                    let teamRow;
+                    teamRows.forEach(row => {
+                        const nameInput = row.querySelector('.team-name');
+                        if (nameInput && nameInput.value.trim() === team) {
+                            teamRow = row;
+                        }
+                    });
+                    
+                    if (teamRow && bookie1Index >= 0 && bookie2Index >= 0) {
+                        odds[team][bookie1] = teamRow.cells[bookie1Index].querySelector('input').value;
+                        odds[team][bookie2] = teamRow.cells[bookie2Index].querySelector('input').value;
+                    }
+                });
+                
+                // Calculate risk-minimizing strategy for this bookmaker pair
+                const result = performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount);
+                
+                if (!bestResult || (result.isProfitable && result.expectedProfit > bestResult.expectedProfit)) {
+                    bestResult = result;
+                }
+            }
+        }
+        
+        // Generate result HTML for this game
+        if (!bestResult || !bestResult.isProfitable) {
+            resultsHTML.push(`
+                <div class="bet-result">
+                    <div class="result-header">
+                        <i class="fas fa-exclamation-triangle"></i> ${gameTitle} - No Viable Strategy Found
+                    </div>
+                    <p>No viable risk-minimizing strategy found with the current odds.</p>
+                    <p>Try adjusting the odds or adding more bookmakers.</p>
+                </div>
+            `);
+        } else {
+            const originalStableOdds = getOriginalOdds(spreadsheet, bestResult.stableTeam, bestResult.stableBookie);
+            const originalRiskierOdds = getOriginalOdds(spreadsheet, bestResult.riskierTeam, bestResult.riskierBookie);
+            
+            resultsHTML.push(`
+                <div class="bet-result">
+                    <div class="result-header">
+                        <i class="fas fa-trophy"></i> ${gameTitle} - Optimal Risk-Minimizing Strategy
+                    </div>
+                    <div class="strategy-type">
+                        <i class="fas fa-shield-alt"></i> Risk-Minimizing Strategy
+                    </div>
+                    <p>Total amount: <span class="highlight">£${totalAmount.toFixed(2)}</span></p>
+                    
+                    <div class="result-details">
+                        <div class="result-box">
+                            <div class="result-label">Stake on ${bestResult.stableTeam} (Stable Bet)</div>
+                            <div class="result-value">£${bestResult.stableStake.toFixed(2)}</div>
+                            <div class="result-label">at ${bestResult.stableBookie} (odds: ${originalStableOdds})</div>
+                        </div>
+                        
+                        <div class="result-box">
+                            <div class="result-label">Stake on ${bestResult.riskierTeam} (Hedge Bet)</div>
+                            <div class="result-value">£${bestResult.riskierStake.toFixed(2)}</div>
+                            <div class="result-label">at ${bestResult.riskierBookie} (odds: ${originalRiskierOdds})</div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario">
+                        <div class="scenario-title">
+                            <i class="fas fa-check-circle"></i> If ${bestResult.stableTeam} wins:
+                        </div>
+                        <p>Profit = <span class="highlight">£${bestResult.expectedProfit.toFixed(2)}</span></p>
+                    </div>
+                    
+                    <div class="scenario">
+                        <div class="scenario-title">
+                            <i class="fas fa-check-circle"></i> If ${bestResult.riskierTeam} wins:
+                        </div>
+                        <p>Result = <span class="highlight ${bestResult.riskierResult >= 0 ? '' : 'break-even'}">
+                        £${bestResult.riskierResult.toFixed(2)}</span> 
+                        ${bestResult.riskierResult > 0 ? '(small profit)' : '(break-even)'}</p>
+                    </div>
+                </div>
+            `);
         }
     });
     
-    return bestCombination;
+    // Display results
+    resultsContent.innerHTML = resultsHTML.join('');
+    resultsContainer.style.display = 'block';
+    
+    // Scroll to results
+    resultsContainer.scrollIntoView({ behavior: 'smooth' });
 }
-
-// Helper function to parse odds in various formats
-function parseOdds(oddsString) {
-    if (!oddsString) return 0;
-    
-    // Handle fractional odds (e.g., "2/1")
-    if (oddsString.includes('/')) {
-        const [a, b] = oddsString.split('/').map(Number);
-        if (isNaN(a) || isNaN(b) || b === 0) return 0;
-        return a / b;
-    }
-    
-    // Handle decimal odds (e.g., "3.0")
-    const decimalOdds = parseFloat(oddsString);
-    if (!isNaN(decimalOdds)) {
-        return decimalOdds - 1; // Convert to profit multiplier
-    }
-    
-    return 0;
-}
+            
+            // Helper function to get original odds string
+            function getOriginalOdds(spreadsheet, teamName, bookieName) {
+                // Find the bookmaker column
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const headers = Array.from(headerRow.querySelectorAll('th'));
+                let bookieIndex = -1;
+                
+                headers.forEach((th, index) => {
+                    const nameInput = th.querySelector('.bookmaker-name');
+                    if (nameInput && nameInput.value.trim() === bookieName) {
+                        bookieIndex = index;
+                    }
+                });
+                
+                if (bookieIndex < 0) return '';
+                
+                // Find the team row
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                let teamRow;
+                
+                teamRows.forEach(row => {
+                    const nameInput = row.querySelector('.team-name');
+                    if (nameInput && nameInput.value.trim() === teamName) {
+                        teamRow = row;
+                    }
+                });
+                
+                if (!teamRow) return '';
+                
+                // Get the odds
+                const oddsInput = teamRow.cells[bookieIndex].querySelector('input');
+                return oddsInput ? oddsInput.value : '';
+            }
+            
+            // Add copyright with current year
+            document.querySelector('footer p').textContent = `BetCalc Pro © ${new Date().getFullYear()} | Last updated: 2025-06-09`;
+        });
+    </script>
+</body>
+</html>
