@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetCalc Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #2E8B57;
+            --secondary-color: #2196F3;
+            --secondary-dark: #1976D2;
+            --danger-color: #f44336;
+            --danger-dark: #D32F2F;
+            --bg-dark: #121212;
+            --bg-panel: #1e1e2e;
+            --bg-card: #262636;
+            --bg-input: #2a2a40;
+            --border-color: #3a3a5a;
+            --text-light: #f0f0f0;
+            --text-muted: #aaa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #16213e);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, var(--secondary-color), var(--secondary-dark));
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger-color), var(--danger-dark));
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-container {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .game-amount {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .game-amount label {
+            font-weight: bold;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+        
+        input, select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            transition: all 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        
+        .game-amount input {
+            width: 120px;
+        }
+        
+        /* Spreadsheet-like styles */
+        .spreadsheet-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .spreadsheet {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        .spreadsheet th, .spreadsheet td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .spreadsheet th {
+            background-color: var(--bg-card);
+            font-weight: bold;
+            color: var(--primary-color);
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .spreadsheet tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .spreadsheet tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .spreadsheet tr:nth-child(even) {
+            background-color: rgba(42, 42, 72, 0.3);
+        }
+        
+        .spreadsheet tr:hover {
+            background-color: rgba(42, 42, 72, 0.6);
+        }
+        
+        .spreadsheet input {
+            width: 100%;
+            min-width: 80px;
+            background-color: var(--bg-input);
+        }
+        
+        .team-cell {
+            min-width: 150px;
+            width: 150px;
+        }
+        
+        .bookmaker-header {
+            min-width: 120px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .bookmaker-name {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .add-row-btn, .remove-row-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 16px;
+        }
+        
+        .bookmaker-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .add-team-row {
+            text-align: center;
+            padding: 10px;
+            border: 1px dashed var(--border-color);
+            border-radius: 5px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-team-row:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .results-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .results-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bet-result {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .result-header {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: rgba(42, 42, 72, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .scenario {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(42, 42, 72, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .highlight {
+            background-color: rgba(76, 175, 80, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .modal-message {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .spreadsheet th, .spreadsheet td {
+                padding: 8px 6px;
+            }
+            
+            .team-cell {
+                min-width: 100px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> BetCalc Pro</h1>
+            <p class="subtitle">Advanced Betting Optimization System</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="controls">
+                <div class="btn-container">
+                    <button id="add-game" class="btn-secondary">
+                        <i class="fas fa-plus-circle"></i> Add Game
+                    </button>
+                    <button id="calculate" class="btn-primary">
+                        <i class="fas fa-calculator"></i> Calculate Optimal Strategy
+                    </button>
+                </div>
+            </div>
+            
+            <div id="games-container">
+                <!-- Games will be added here dynamically -->
+            </div>
+                
+            <div id="results" class="results-container">
+                <h2 class="results-title"><i class="fas fa-chart-line"></i> Optimal Betting Strategy</h2>
+                <div id="results-content">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>BetCalc Pro &copy; 2025</p>
+        </footer>
+    </div>
+    
+    <!-- Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-check-circle"></i> Confirm Calculation</h3>
+            </div>
+            <p class="modal-message">Are you sure you want to calculate the betting strategy with the current odds? You can go back to adjust if needed.</p>
+            <div class="modal-buttons">
+                <button id="confirm-calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Yes, Calculate
+                </button>
+                <button id="cancel-calculate" class="btn-danger">
+                    <i class="fas fa-times"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gamesContainer = document.getElementById('games-container');
+            const addGameBtn = document.getElementById('add-game');
+            const calculateBtn = document.getElementById('calculate');
+            const modal = document.getElementById('confirmation-modal');
+            const confirmBtn = document.getElementById('confirm-calculate');
+            const cancelBtn = document.getElementById('cancel-calculate');
+            const resultsContainer = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            
+            let gameCounter = 0;
+            
+            // Create initial game
+            createGame();
+            
+            // Add new game
+            addGameBtn.addEventListener('click', createGame);
+            
+            // Show confirmation modal
+            calculateBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            // Cancel calculation
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Confirm calculation
+            confirmBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                calculateStrategy();
+            });
+            
+            // Create a new game with spreadsheet layout
+            function createGame() {
+                gameCounter++;
+                const gameId = `game-${gameCounter}`;
+                
+                const gameElement = document.createElement('div');
+                gameElement.className = 'game-container';
+                gameElement.id = gameId;
+                
+                gameElement.innerHTML = `
+                    <div class="game-header">
+                        <div class="game-title">
+                            <i class="fas fa-hockey-puck"></i> Game #${gameCounter}
+                        </div>
+                        <div class="game-amount">
+                            <label for="amount-${gameId}">Amount to Bet (£):</label>
+                            <input type="number" id="amount-${gameId}" min="1" value="100" step="10">
+                        </div>
+                        <button class="btn-danger remove-game">
+                            <i class="fas fa-trash-alt"></i> Remove Game
+                        </button>
+                    </div>
+                    
+                    <div class="spreadsheet-container">
+                        <table class="spreadsheet" id="spreadsheet-${gameId}">
+                            <thead>
+                                <tr id="bookmaker-row-${gameId}">
+                                    <th class="team-cell">Team</th>
+                                    <th class="bookmaker-header">
+                                        <input type="text" class="bookmaker-name" value="Bookmaker 1" placeholder="Bookmaker name">
+                                        <div class="bookmaker-actions">
+                                            <button class="btn-danger remove-row-btn" title="Remove bookmaker" disabled>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th class="bookmaker-header">
+                                        <input type="text" class="bookmaker-name" value="Bookmaker 2" placeholder="Bookmaker name">
+                                        <div class="bookmaker-actions">
+                                            <button class="btn-danger remove-row-btn" title="Remove bookmaker" disabled>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th class="bookmaker-header">
+                                        <button class="btn-secondary add-row-btn" title="Add bookmaker">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="team-cell">
+                                        <input type="text" value="Team A" placeholder="Team name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 2/1">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 2/1">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="team-cell">
+                                        <input type="text" value="Team B" placeholder="Team name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 4/1">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 3/1">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="add-team-row" data-game="${gameId}">
+                        <i class="fas fa-plus-circle"></i> Add Team
+                    </div>
+                `;
+                
+                gamesContainer.appendChild(gameElement);
+                
+                // Add event listener to remove game button
+                const removeGameBtn = gameElement.querySelector('.remove-game');
+                removeGameBtn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.game-container').length > 1) {
+                        gameElement.remove();
+                    } else {
+                        alert('You need at least one game!');
+                    }
+                });
+                
+                // Add event listener to add bookmaker button
+                const addBookmakerBtn = gameElement.querySelector('.add-row-btn');
+                addBookmakerBtn.addEventListener('click', function() {
+                    addBookmaker(gameId);
+                });
+                
+                // Add event listener to add team row
+                const addTeamRow = gameElement.querySelector('.add-team-row');
+                addTeamRow.addEventListener('click', function() {
+                    addTeam(gameId);
+                });
+                
+                // Add event listeners to remove bookmaker buttons
+                setupRemoveBookmakerButtons(gameId);
+            }
+            
+            // Add a new bookmaker column
+function addBookmaker(gameId) {
+    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+    if (!spreadsheet) return;
+    
+    // Get the current number of bookmaker columns
+    const headerRow = spreadsheet.querySelector('thead tr');
+    const bookmakerCount = headerRow.querySelectorAll('th').length - 1; // Subtract 1 for the team column
+    const newBookmakerNum = bookmakerCount + 1;
+    
+    // Add header for the new bookmaker column
+    const newHeader = document.createElement('th');
+    newHeader.className = 'bookmaker-header';
+    newHeader.innerHTML = `
+        <div class="bookmaker-title">
+            <span contenteditable="true">Bet${newBookmakerNum}</span>
+            <button class="remove-bookmaker" title="Remove this bookmaker">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    headerRow.appendChild(newHeader);
+    
+    // Add odds cells for each team
+    const teamRows = spreadsheet.querySelectorAll('tbody tr');
+    teamRows.forEach((row, teamIndex) => {
+        const teamName = row.querySelector('.team-name-input').value || `Team${String.fromCharCode(65 + teamIndex)}`;
+        const newCell = document.createElement('td');
+        newCell.innerHTML = `<input type="text" class="odds-input bet${newBookmakerNum}-${teamName}" placeholder="e.g., 2/1">`;
+        row.appendChild(newCell);
+    });
+    
+    // Add event listener to remove button
+    const removeBtn = newHeader.querySelector('.remove-bookmaker');
+    removeBtn.addEventListener('click', function() {
+        if (bookmakerCount > 2) { // Keep at least 2 bookmakers
+            // Remove header
+            headerRow.removeChild(newHeader);
+            
+            // Remove corresponding cells from each row
+            teamRows.forEach(row => {
+                row.removeChild(row.cells[bookmakerCount]);
+            });
+            
+            // Update calculation logic to account for removed bookmaker
+            updateCalculationCapabilities(gameId);
+        } else {
+            alert('You need at least two bookmakers for comparison!');
+        }
+    });
+    
+    // Update calculation logic to include the new bookmaker
+    updateCalculationCapabilities(gameId);
+}
+
+// Update calculation capabilities when bookmakers change
+function updateCalculationCapabilities(gameId) {
+    // Get all current bookmakers for this game
+    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+    const bookmakerHeaders = spreadsheet.querySelectorAll('.bookmaker-header');
+    const bookmakerNames = [];
+    
+    bookmakerHeaders.forEach(header => {
+        const nameElement = header.querySelector('.bookmaker-title span');
+        bookmakerNames.push(nameElement.textContent.trim());
+    });
+    
+    // Update the calculation algorithm to handle variable number of bookmakers
+    const calculationLogic = document.getElementById(`calculation-logic-${gameId}`);
+    if (calculationLogic) {
+        calculationLogic.setAttribute('data-bookmakers', JSON.stringify(bookmakerNames));
+    }
+    
+    // Update the UI to show all possible combinations
+    updateComparisonMatrix(gameId, bookmakerNames);
+}
+
+// Update the comparison matrix showing all possible bookmaker combinations
+function updateComparisonMatrix(gameId, bookmakerNames) {
+    const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
+    if (!matrixContainer) return;
+    
+    let matrixHTML = '<h4>Potential Arbitrage Combinations</h4>';
+    matrixHTML += '<div class="matrix-grid">';
+    
+    // Create a grid showing all possible combinations of bookmakers
+    for (let i = 0; i < bookmakerNames.length; i++) {
+        for (let j = i + 1; j < bookmakerNames.length; j++) {
+            matrixHTML += `
+                <div class="matrix-cell" data-combination="${bookmakerNames[i]}-${bookmakerNames[j]}">
+                    <div class="combination-title">${bookmakerNames[i]} vs ${bookmakerNames[j]}</div>
+                    <div class="combination-status pending">
+                        <i class="fas fa-question-circle"></i> Pending calculation
+                    </div>
+                    <button class="calculate-specific" data-bookie1="${bookmakerNames[i]}" data-bookie2="${bookmakerNames[j]}">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    matrixHTML += '</div>';
+    matrixContainer.innerHTML = matrixHTML;
+    
+    // Add event listeners to the individual calculation buttons
+    const calcButtons = matrixContainer.querySelectorAll('.calculate-specific');
+    calcButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const bookie1 = this.getAttribute('data-bookie1');
+            const bookie2 = this.getAttribute('data-bookie2');
+            calculateSpecificCombination(gameId, bookie1, bookie2);
+        });
+    });
+}
+
+// Calculate specific bookmaker combination
+function calculateSpecificCombination(gameId, bookie1, bookie2) {
+    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+    const amountInput = document.getElementById(`game-amount-${gameId}`);
+    const totalAmount = amountInput ? parseFloat(amountInput.value) : 10;
+    
+    // Get team names
+    const teamRows = spreadsheet.querySelectorAll('tbody tr');
+    const teamNames = Array.from(teamRows).map(row => {
+        return row.querySelector('.team-name-input').value || 'Team';
+    });
+    
+    // Get odds for specific bookmakers
+    let odds = {};
+    teamNames.forEach((team, index) => {
+        odds[team] = {
+            [bookie1]: spreadsheet.querySelector(`.bet${bookie1.replace(/[^0-9]/g, '')}-${team}`).value,
+            [bookie2]: spreadsheet.querySelector(`.bet${bookie2.replace(/[^0-9]/g, '')}-${team}`).value
+        };
+    });
+    
+    // Perform calculation
+    const result = performArbitrageCalculation(teamNames, odds, bookie1, bookie2, totalAmount);
+    
+    // Update the matrix cell with the result
+    const matrixCell = document.querySelector(`#comparison-matrix-${gameId} [data-combination="${bookie1}-${bookie2}"]`);
+    if (matrixCell && result) {
+        const statusDiv = matrixCell.querySelector('.combination-status');
+        
+        if (result.isProfitable) {
+            statusDiv.className = 'combination-status profitable';
+            statusDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> 
+                Profitable: £${result.expectedProfit.toFixed(2)}
+            `;
+        } else {
+            statusDiv.className = 'combination-status not-profitable';
+            statusDiv.innerHTML = `
+                <i class="fas fa-times-circle"></i>
+                Not profitable
+            `;
+        }
+    }
+}
+
+// Perform the actual arbitrage calculation
+function performArbitrageCalculation(teamNames, odds, bookie1, bookie2, totalAmount) {
+    // Parse odds
+    let parsedOdds = {};
+    try {
+        teamNames.forEach(team => {
+            parsedOdds[team] = {
+                [bookie1]: parseOdds(odds[team][bookie1]),
+                [bookie2]: parseOdds(odds[team][bookie2])
+            };
+        });
+    } catch (e) {
+        return { isProfitable: false, error: 'Invalid odds format' };
+    }
+    
+    // Calculate optimal stakes and expected profit
+    let bestCombination = { isProfitable: false, expectedProfit: 0 };
+    
+    // Compare all possible combinations of bookmakers for each team
+    let combinations = [];
+    teamNames.forEach(teamA => {
+        teamNames.forEach(teamB => {
+            if (teamA === teamB) return;
+            
+            // Try teamA with bookie1, teamB with bookie2
+            combinations.push({
+                [teamA]: { bookie: bookie1, odds: parsedOdds[teamA][bookie1] },
+                [teamB]: { bookie: bookie2, odds: parsedOdds[teamB][bookie2] }
+            });
+            
+            // Try teamA with bookie2, teamB with bookie1
+            combinations.push({
+                [teamA]: { bookie: bookie2, odds: parsedOdds[teamA][bookie2] },
+                [teamB]: { bookie: bookie1, odds: parsedOdds[teamB][bookie1] }
+            });
+        });
+    });
+    
+    // Find the best combination
+    combinations.forEach(combo => {
+        const teams = Object.keys(combo);
+        if (teams.length < 2) return;
+        
+        const teamA = teams[0];
+        const teamB = teams[1];
+        
+        const alpha = combo[teamA].odds;
+        const beta = combo[teamB].odds;
+        
+        // Calculate optimal stake distribution
+        const x = (beta * totalAmount) / (beta + 1);
+        const y = totalAmount - x;
+        const expectedProfit = (alpha + 1) * x - totalAmount;
+        
+        if (expectedProfit > bestCombination.expectedProfit) {
+            bestCombination = {
+                isProfitable: expectedProfit > 0,
+                expectedProfit: expectedProfit,
+                stakes: {
+                    [teamA]: { amount: x, bookie: combo[teamA].bookie },
+                    [teamB]: { amount: y, bookie: combo[teamB].bookie }
+                }
+            };
+        }
+    });
+    
+    return bestCombination;
+}
+
+// Helper function to parse odds in various formats
+function parseOdds(oddsString) {
+    if (!oddsString) return 0;
+    
+    // Handle fractional odds (e.g., "2/1")
+    if (oddsString.includes('/')) {
+        const [a, b] = oddsString.split('/').map(Number);
+        if (isNaN(a) || isNaN(b) || b === 0) return 0;
+        return a / b;
+    }
+    
+    // Handle decimal odds (e.g., "3.0")
+    const decimalOdds = parseFloat(oddsString);
+    if (!isNaN(decimalOdds)) {
+        return decimalOdds - 1; // Convert to profit multiplier
+    }
+    
+    return 0;
+}
