@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetCalc Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #2E8B57;
+            --secondary-color: #2196F3;
+            --secondary-dark: #1976D2;
+            --danger-color: #f44336;
+            --danger-dark: #D32F2F;
+            --bg-dark: #121212;
+            --bg-panel: #1e1e2e;
+            --bg-card: #262636;
+            --bg-input: #2a2a40;
+            --border-color: #3a3a5a;
+            --text-light: #f0f0f0;
+            --text-muted: #aaa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #16213e);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, var(--secondary-color), var(--secondary-dark));
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger-color), var(--danger-dark));
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-container {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .game-amount {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .game-amount label {
+            font-weight: bold;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+        
+        input, select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            transition: all 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        
+        .game-amount input {
+            width: 120px;
+        }
+        
+        /* Spreadsheet-like styles */
+        .spreadsheet-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .spreadsheet {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        .spreadsheet th, .spreadsheet td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .spreadsheet th {
+            background-color: var(--bg-card);
+            font-weight: bold;
+            color: var(--primary-color);
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .spreadsheet tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .spreadsheet tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .spreadsheet tr:nth-child(even) {
+            background-color: rgba(42, 42, 72, 0.3);
+        }
+        
+        .spreadsheet tr:hover {
+            background-color: rgba(42, 42, 72, 0.6);
+        }
+        
+        .spreadsheet input {
+            width: 100%;
+            min-width: 80px;
+            background-color: var(--bg-input);
+        }
+        
+        .team-cell {
+            min-width: 150px;
+            width: 150px;
+        }
+        
+        .bookmaker-header {
+            min-width: 120px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .bookmaker-name {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .add-row-btn, .remove-row-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 16px;
+        }
+        
+        .bookmaker-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .add-team-row {
+            display: none; /* Hide the add team row since we only need 2 teams */
+        }
+        
+        .results-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .results-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bet-result {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .result-header {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: rgba(42, 42, 72, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .scenario {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(42, 42, 72, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .highlight {
+            background-color: rgba(76, 175, 80, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .highlight.break-even {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .strategy-type {
+            font-size: 0.9rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .modal-message {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* New styles for the bookmaker title */
+        .bookmaker-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .bookmaker-title span {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .remove-bookmaker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 10px;
+            background: var(--danger-color);
+        }
+        
+        /* New styles for comparison matrix */
+        .comparison-matrix {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .comparison-matrix h4 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .matrix-cell {
+            background: rgba(42, 42, 72, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .combination-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .combination-status {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .combination-status.profitable {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .combination-status.not-profitable {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .combination-status.pending {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .team-name {
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .spreadsheet th, .spreadsheet td {
+                padding: 8px 6px;
+            }
+            
+            .team-cell {
+                min-width: 100px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> BetCalc Pro</h1>
+            <p class="subtitle">Advanced Betting Optimization System</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="controls">
+                <div class="btn-container">
+                    <button id="add-game" class="btn-secondary">
+                        <i class="fas fa-plus-circle"></i> Add Game
+                    </button>
+                    <button id="calculate" class="btn-primary">
+                        <i class="fas fa-calculator"></i> Calculate Optimal Strategy
+                    </button>
+                </div>
+            </div>
+            
+            <div id="games-container">
+                <!-- Games will be added here dynamically -->
+            </div>
+                
+            <div id="results" class="results-container">
+                <h2 class="results-title"><i class="fas fa-chart-line"></i> Optimal Betting Strategy</h2>
+                <div id="results-content">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>BetCalc Pro &copy; 2025</p>
+        </footer>
+    </div>
+    <!-- Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-check-circle"></i> Confirm Calculation</h3>
+            </div>
+            <p class="modal-message">Are you sure you want to calculate the betting strategy with the current odds? You can go back to adjust if needed.</p>
+            <div class="modal-buttons">
+                <button id="confirm-calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Yes, Calculate
+                </button>
+                <button id="cancel-calculate" class="btn-danger">
+                    <i class="fas fa-times"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gamesContainer = document.getElementById('games-container');
+            const addGameBtn = document.getElementById('add-game');
+            const calculateBtn = document.getElementById('calculate');
+            const modal = document.getElementById('confirmation-modal');
+            const confirmBtn = document.getElementById('confirm-calculate');
+            const cancelBtn = document.getElementById('cancel-calculate');
+            const resultsContainer = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            
+            let gameCounter = 0;
+            
+            // Create initial game
+            createGame();
+            
+            // Add new game
+            addGameBtn.addEventListener('click', createGame);
+            
+            // Show confirmation modal
+            calculateBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            // Cancel calculation
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Confirm calculation
+            confirmBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                calculateStrategy();
+            });
+            
+            // Create a new game with spreadsheet layout
+            function createGame() {
+                gameCounter++;
+                const gameId = `game-${gameCounter}`;
+                
+                const gameElement = document.createElement('div');
+                gameElement.className = 'game-container';
+                gameElement.id = gameId;
+                
+                gameElement.innerHTML = `
+                    <div class="game-header">
+                        <div class="game-title">
+                            <i class="fas fa-hockey-puck"></i> Game #${gameCounter}
+                        </div>
+                        <div class="game-amount">
+                            <label for="amount-${gameId}">Amount to Bet (£):</label>
+                            <input type="number" id="amount-${gameId}" min="1" value="100" step="10">
+                        </div>
+                        <button class="btn-danger remove-game">
+                            <i class="fas fa-trash-alt"></i> Remove Game
+                        </button>
+                    </div>
+                    
+                    <div class="spreadsheet-container">
+                        <table class="spreadsheet" id="spreadsheet-${gameId}">
+                            <thead>
+                                <tr id="bookmaker-row-${gameId}">
+                                    <th class="team-cell">Team</th>
+                                    <th class="bookmaker-header">
+                                        <input type="text" class="bookmaker-name" value="Bookmaker 1" placeholder="Bookmaker name">
+                                        <div class="bookmaker-actions">
+                                            <button class="btn-danger remove-row-btn" title="Remove bookmaker" disabled>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th class="bookmaker-header">
+                                        <input type="text" class="bookmaker-name" value="Bookmaker 2" placeholder="Bookmaker name">
+                                        <div class="bookmaker-actions">
+                                            <button class="btn-danger remove-row-btn" title="Remove bookmaker" disabled>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th class="bookmaker-header">
+                                        <button class="btn-secondary add-row-btn" title="Add bookmaker">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="team-cell">
+                                        <input type="text" class="team-name" value="Team A" placeholder="Team name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 2/1">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 2/1">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="team-cell">
+                                        <input type="text" class="team-name" value="Team B" placeholder="Team name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 4/1">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="odds-input" placeholder="e.g., 3/1">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                gamesContainer.appendChild(gameElement);
+
+                // Create comparison matrix container for this game
+                createComparisonMatrix(gameId);
+                
+                // Add event listener to remove game button
+                const removeGameBtn = gameElement.querySelector('.remove-game');
+                removeGameBtn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.game-container').length > 1) {
+                        gameElement.remove();
+                    } else {
+                        alert('You need at least one game!');
+                    }
+                });
+                
+                // Add event listener to add bookmaker button
+                const addBookmakerBtn = gameElement.querySelector('.add-row-btn');
+                addBookmakerBtn.addEventListener('click', function() {
+                    addBookmaker(gameId);
+                });
+                
+                // Add event listeners to remove bookmaker buttons
+                setupRemoveBookmakerButtons(gameId);
+            }
+            
+            // Add a new bookmaker column
+            function addBookmaker(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                // Get the current number of bookmaker columns
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // Subtract 1 for the add button
+                const newBookmakerNum = bookmakerCount + 1;
+                
+                // Create new header for the bookmaker column
+                const newHeader = document.createElement('th');
+                newHeader.className = 'bookmaker-header';
+                newHeader.innerHTML = `
+                    <input type="text" class="bookmaker-name" value="Bookmaker ${newBookmakerNum}" placeholder="Bookmaker name">
+                    <div class="bookmaker-actions">
+                        <button class="btn-danger remove-row-btn" title="Remove bookmaker">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Insert the new header before the add button column
+                const addBtnColumn = headerRow.querySelector('th:last-child');
+                headerRow.insertBefore(newHeader, addBtnColumn);
+                
+                // Add cells for each team row
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                teamRows.forEach(row => {
+                    const newCell = document.createElement('td');
+                    newCell.innerHTML = `<input type="text" class="odds-input" placeholder="e.g., 2/1">`;
+                    
+                    // Insert before the empty cell
+                    const lastCell = row.querySelector('td:last-child');
+                    row.insertBefore(newCell, lastCell);
+                });
+                
+                // Setup event listeners for the new remove button
+                setupRemoveBookmakerButtons(gameId);
+                
+                // Update the comparison matrix
+                updateBookmakerComparison(gameId);
+            }
+
+            // Set up remove bookmaker buttons
+            function setupRemoveBookmakerButtons(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const removeButtons = spreadsheet.querySelectorAll('.remove-row-btn');
+                removeButtons.forEach(button => {
+                    // Clear existing event listeners
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+                    
+                    newButton.addEventListener('click', function() {
+                        const headerRow = spreadsheet.querySelector('thead tr');
+                        const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // -1 for add button
+                        
+                        if (bookmakerCount > 2) { // Keep at least 2 bookmakers
+                            // Find the index of this bookmaker column
+                            const th = this.closest('th');
+                            const columnIndex = Array.from(headerRow.children).indexOf(th);
+                            
+                            // Remove this column from all rows
+                            const allRows = spreadsheet.querySelectorAll('tr');
+                            allRows.forEach(row => {
+                                if (row.cells[columnIndex]) {
+                                    row.removeChild(row.cells[columnIndex]);
+                                }
+                            });
+                            
+                            // Update buttons state and comparison matrix
+                            updateRemoveButtonsState(gameId);
+                            updateBookmakerComparison(gameId);
+                        } else {
+                            alert('You need at least two bookmakers for comparison!');
+                        }
+                    });
+                });
+                
+                updateRemoveButtonsState(gameId);
+            }
+            
+            // Update state of remove buttons
+            function updateRemoveButtonsState(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const bookmakerCount = headerRow.querySelectorAll('.bookmaker-header').length - 1; // -1 for add button
+                const removeButtons = spreadsheet.querySelectorAll('.remove-row-btn');
+                
+                removeButtons.forEach(button => {
+                    if (bookmakerCount <= 2) {
+                        button.disabled = true;
+                    } else {
+                        button.disabled = false;
+                    }
+                });
+            }
+	
+	            // Create comparison matrix container
+            function createComparisonMatrix(gameId) {
+                const gameElement = document.getElementById(gameId);
+                if (!gameElement) return;
+                
+                // Check if matrix already exists
+                if (gameElement.querySelector(`#comparison-matrix-${gameId}`)) return;
+                
+                // Create matrix container
+                const matrixContainer = document.createElement('div');
+                matrixContainer.id = `comparison-matrix-${gameId}`;
+                matrixContainer.className = 'comparison-matrix';
+                
+                // Add after the spreadsheet container
+                const spreadsheetContainer = gameElement.querySelector('.spreadsheet-container');
+                if (spreadsheetContainer) {
+                    spreadsheetContainer.insertAdjacentElement('afterend', matrixContainer);
+                } else {
+                    gameElement.appendChild(matrixContainer);
+                }
+                
+                // Update the content
+                updateBookmakerComparison(gameId);
+                
+                return matrixContainer;
+            }
+            
+            // Update bookmaker comparison matrix
+            function updateBookmakerComparison(gameId) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
+                
+                if (!spreadsheet || !matrixContainer) return;
+                
+                // Get bookmaker names
+                const bookmakerNames = [];
+                const bookmakerInputs = spreadsheet.querySelectorAll('.bookmaker-name');
+                bookmakerInputs.forEach(input => {
+                    if (input.value.trim()) {
+                        bookmakerNames.push(input.value.trim());
+                    }
+                });
+                
+                // Generate matrix HTML
+                let matrixHTML = '<h4>Potential Risk-Minimizing Combinations</h4>';
+                matrixHTML += '<div class="matrix-grid">';
+                
+                // Generate all possible combinations
+                for (let i = 0; i < bookmakerNames.length; i++) {
+                    for (let j = i + 1; j < bookmakerNames.length; j++) {
+                        const bookie1 = bookmakerNames[i];
+                        const bookie2 = bookmakerNames[j];
+                        
+                        matrixHTML += `
+                            <div class="matrix-cell" data-combination="${bookie1}-${bookie2}">
+                                <div class="combination-title">${bookie1} vs ${bookie2}</div>
+                                <div class="combination-status pending">
+                                    <i class="fas fa-question-circle"></i> Pending calculation
+                                </div>
+                                <button class="btn-secondary calculate-specific" data-bookie1="${bookie1}" data-bookie2="${bookie2}">
+                                    <i class="fas fa-calculator"></i> Calculate
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+                
+                matrixHTML += '</div>';
+                matrixContainer.innerHTML = matrixHTML;
+                
+                // Add event listeners to calculation buttons
+                const calcButtons = matrixContainer.querySelectorAll('.calculate-specific');
+                calcButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const bookie1 = this.getAttribute('data-bookie1');
+                        const bookie2 = this.getAttribute('data-bookie2');
+                        calculateSpecificCombination(gameId, bookie1, bookie2);
+                    });
+                });
+            }
+            
+            // Calculate specific bookmaker combination
+            function calculateSpecificCombination(gameId, bookie1, bookie2) {
+                const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                if (!spreadsheet) return;
+                
+                const amountInput = document.getElementById(`amount-${gameId}`);
+                const totalAmount = amountInput ? parseFloat(amountInput.value) : 100;
+                
+                // Get team names and their odds for these bookmakers
+                const teams = [];
+                const odds = {};
+                
+                // Find indices of the bookmaker columns
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const headers = Array.from(headerRow.querySelectorAll('th'));
+                const bookieIndices = {};
+                
+                headers.forEach((th, index) => {
+                    const nameInput = th.querySelector('.bookmaker-name');
+                    if (nameInput) {
+                        const bookieName = nameInput.value.trim();
+                        if (bookieName === bookie1 || bookieName === bookie2) {
+                            bookieIndices[bookieName] = index;
+                        }
+                    }
+                });
+                
+                // If we couldn't find the bookmakers, return
+                if (!bookieIndices[bookie1] || !bookieIndices[bookie2]) {
+                    console.error('Could not find bookmaker columns');
+                    return;
+                }
+                
+                // Get team names and odds
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                teamRows.forEach(row => {
+                    const teamNameInput = row.querySelector('.team-name');
+                    if (!teamNameInput) return;
+                    
+                    const teamName = teamNameInput.value.trim() || 'Unnamed Team';
+                    teams.push(teamName);
+                    
+                    odds[teamName] = {
+                        [bookie1]: row.cells[bookieIndices[bookie1]].querySelector('input').value,
+                        [bookie2]: row.cells[bookieIndices[bookie2]].querySelector('input').value
+                    };
+                });
+                
+                // Perform the risk-minimizing calculation
+                const result = performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount);
+                
+                // Update the UI with the result
+                const matrixContainer = document.getElementById(`comparison-matrix-${gameId}`);
+                if (!matrixContainer) return;
+                
+                const matrixCell = matrixContainer.querySelector(`[data-combination="${bookie1}-${bookie2}"]`);
+                if (!matrixCell) return;
+                
+                const statusDiv = matrixCell.querySelector('.combination-status');
+                if (!statusDiv) return;
+                
+                if (result.isProfitable) {
+                    statusDiv.className = 'combination-status profitable';
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> 
+                        Profit on ${result.stableTeam}: £${result.expectedProfit.toFixed(2)}
+                    `;
+                } else {
+                    statusDiv.className = 'combination-status not-profitable';
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-times-circle"></i>
+                        No viable strategy
+                    `;
+                }
+                
+                return result;
+            }
+            
+            // Perform risk-minimizing calculation
+            function performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount) {
+                if (!teams || !odds || teams.length < 2) {
+                    return { isProfitable: false, error: 'Invalid teams data' };
+                }
+                
+                // Parse odds
+                const parsedOdds = {};
+                try {
+                    teams.forEach(team => {
+                        parsedOdds[team] = {
+                            [bookie1]: parseOdds(odds[team][bookie1]),
+                            [bookie2]: parseOdds(odds[team][bookie2])
+                        };
+                    });
+                } catch (e) {
+                    return { isProfitable: false, error: 'Invalid odds format' };
+                }
+                
+                // Calculate optimal stakes with preference for stable bets
+                let bestCombination = { isProfitable: false, expectedProfit: -Infinity };
+                
+                // Try all possible combinations
+                teams.forEach(teamA => {
+                    teams.forEach(teamB => {
+                        if (teamA === teamB) return; // Skip same team
+                        
+                        // Try teamA with bookie1, teamB with bookie2
+                        try {
+                            const oddsA = parsedOdds[teamA][bookie1];
+                            const oddsB = parsedOdds[teamB][bookie2];
+                            
+                            if (oddsA > 0 && oddsB > 0) {
+                                // Find team with lower odds (more stable)
+                                let stableTeam, stableBookie, stableOdds, riskierTeam, riskierBookie, riskierOdds;
+                                
+                                if (oddsA <= oddsB) {
+                                    stableTeam = teamA;
+                                    stableBookie = bookie1;
+                                    stableOdds = oddsA;
+                                    riskierTeam = teamB;
+                                    riskierBookie = bookie2;
+                                    riskierOdds = oddsB;
+                                } else {
+                                    stableTeam = teamB;
+                                    stableBookie = bookie2;
+                                    stableOdds = oddsB;
+                                    riskierTeam = teamA;
+                                    riskierBookie = bookie1;
+                                    riskierOdds = oddsA;
+                                }
+                                
+                                // Calculate stakes to break even on riskier bet
+                                // If we bet x on stable team and y on riskier team, 
+                                // then x + y = totalAmount and (stableOdds + 1) * x = y
+                                // This means y = totalAmount - x, and (stableOdds + 1) * x = totalAmount - x
+                                // Solving for x: x * (stableOdds + 2) = totalAmount
+                                // Therefore x = totalAmount / (stableOdds + 2)
+                                
+                                const stakeOnStable = totalAmount / (stableOdds + 2);
+                                const stakeOnRiskier = totalAmount - stakeOnStable;
+                                
+                                // Calculate profit when stable team wins
+                                const profitIfStableWins = (stableOdds + 1) * stakeOnStable - totalAmount;
+                                
+                                // Calculate profit/loss when riskier team wins
+                                const resultIfRiskierWins = (riskierOdds + 1) * stakeOnRiskier - totalAmount;
+                                
+                                // We prefer combinations where:
+                                // 1. Profit on stable team win is highest
+                                // 2. We at least break even on riskier team win
+                                if (profitIfStableWins > 0 && resultIfRiskierWins >= -0.01) {  // Allow tiny loss due to rounding
+                                    if (profitIfStableWins > bestCombination.expectedProfit) {
+                                        bestCombination = {
+                                            isProfitable: true,
+                                            expectedProfit: profitIfStableWins,
+                                            stableTeam: stableTeam,
+                                            stableBookie: stableBookie,
+                                            stableOdds: stableOdds,
+                                            stableStake: stakeOnStable,
+                                            riskierTeam: riskierTeam,
+                                            riskierBookie: riskierBookie,
+                                            riskierOdds: riskierOdds,
+                                            riskierStake: stakeOnRiskier,
+                                            riskierResult: resultIfRiskierWins
+                                        };
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            // Skip invalid odds
+                            console.error("Error in calculation:", e);
+                        }
+                        
+                        // Try teamA with bookie2, teamB with bookie1
+                        try {
+                            const oddsA = parsedOdds[teamA][bookie2];
+                            const oddsB = parsedOdds[teamB][bookie1];
+                            
+                            if (oddsA > 0 && oddsB > 0) {
+                                // Find team with lower odds (more stable)
+                                let stableTeam, stableBookie, stableOdds, riskierTeam, riskierBookie, riskierOdds;
+                                
+                                if (oddsA <= oddsB) {
+                                    stableTeam = teamA;
+                                    stableBookie = bookie2;
+                                    stableOdds = oddsA;
+                                    riskierTeam = teamB;
+                                    riskierBookie = bookie1;
+                                    riskierOdds = oddsB;
+                                } else {
+                                    stableTeam = teamB;
+                                    stableBookie = bookie1;
+                                    stableOdds = oddsB;
+                                    riskierTeam = teamA;
+                                    riskierBookie = bookie2;
+                                    riskierOdds = oddsA;
+                                }
+                                
+                                // Calculate stakes to break even on riskier bet
+                                const stakeOnStable = totalAmount / (stableOdds + 2);
+                                const stakeOnRiskier = totalAmount - stakeOnStable;
+                                
+                                // Calculate profit when stable team wins
+                                const profitIfStableWins = (stableOdds + 1) * stakeOnStable - totalAmount;
+                                
+                                // Calculate profit/loss when riskier team wins
+                                const resultIfRiskierWins = (riskierOdds + 1) * stakeOnRiskier - totalAmount;
+                                
+                                if (profitIfStableWins > 0 && resultIfRiskierWins >= -0.01) {
+                                    if (profitIfStableWins > bestCombination.expectedProfit) {
+                                        bestCombination = {
+                                            isProfitable: true,
+                                            expectedProfit: profitIfStableWins,
+                                            stableTeam: stableTeam,
+                                            stableBookie: stableBookie,
+                                            stableOdds: stableOdds,
+                                            stableStake: stakeOnStable,
+                                            riskierTeam: riskierTeam,
+                                            riskierBookie: riskierBookie,
+                                            riskierOdds: riskierOdds,
+                                            riskierStake: stakeOnRiskier,
+                                            riskierResult: resultIfRiskierWins
+                                        };
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            // Skip invalid odds
+                        }
+                    });
+                });
+                
+                return bestCombination;
+            }
+	
+	            // Helper function to parse odds in various formats
+            function parseOdds(oddsString) {
+                if (!oddsString || typeof oddsString !== 'string') return 0;
+                
+                oddsString = oddsString.trim();
+                
+                // Handle fractional odds (e.g., "2/1")
+                if (oddsString.includes('/')) {
+                    const [a, b] = oddsString.split('/').map(Number);
+                    if (isNaN(a) || isNaN(b) || b === 0) return 0;
+                    return a / b;
+                }
+                
+                // Handle decimal odds (e.g., "3.0")
+                const decimalOdds = parseFloat(oddsString);
+                if (!isNaN(decimalOdds)) {
+                    return decimalOdds - 1; // Convert to profit multiplier
+                }
+                
+                return 0;
+            }
+            
+            // Calculate the optimal risk-minimizing betting strategy for all games
+            function calculateStrategy() {
+                const gameContainers = document.querySelectorAll('.game-container');
+                const resultsHTML = [];
+                
+                // Process each game
+                gameContainers.forEach(gameContainer => {
+                    const gameId = gameContainer.id;
+                    const gameTitle = gameContainer.querySelector('.game-title').textContent.trim();
+                    const amountInput = gameContainer.querySelector('input[type="number"]');
+                    const totalAmount = amountInput ? parseFloat(amountInput.value) : 100;
+                    
+                    const spreadsheet = document.getElementById(`spreadsheet-${gameId}`);
+                    if (!spreadsheet) return;
+                    
+                    // Get bookmakers
+                    const bookmakers = [];
+                    const bookmakerInputs = spreadsheet.querySelectorAll('.bookmaker-name');
+                    bookmakerInputs.forEach(input => {
+                        if (input.value.trim()) {
+                            bookmakers.push(input.value.trim());
+                        }
+                    });
+                    
+                    // Get teams
+                    const teams = [];
+                    const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                    teamRows.forEach(row => {
+                        const teamNameInput = row.querySelector('.team-name');
+                        if (teamNameInput && teamNameInput.value.trim()) {
+                            teams.push(teamNameInput.value.trim());
+                        }
+                    });
+                    
+                    if (teams.length < 2 || bookmakers.length < 2) {
+                        resultsHTML.push(`
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> ${gameTitle} - Error
+                                </div>
+                                <p>You need at least 2 teams and 2 bookmakers to calculate a strategy.</p>
+                            </div>
+                        `);
+                        return;
+                    }
+                    
+                    // Find the best combination across all bookmakers
+                    let bestResult = { isProfitable: false, expectedProfit: -Infinity };
+                    
+                    // Try all bookmaker combinations
+                    for (let i = 0; i < bookmakers.length; i++) {
+                        for (let j = i + 1; j < bookmakers.length; j++) {
+                            const bookie1 = bookmakers[i];
+                            const bookie2 = bookmakers[j];
+                            
+                            // Get odds for these bookmakers
+                            const odds = {};
+                            teams.forEach(team => {
+                                odds[team] = {};
+                                
+                                // Find bookmaker columns
+                                const headerRow = spreadsheet.querySelector('thead tr');
+                                const headers = Array.from(headerRow.querySelectorAll('th'));
+                                let bookie1Index = -1;
+                                let bookie2Index = -1;
+                                
+                                headers.forEach((th, index) => {
+                                    const nameInput = th.querySelector('.bookmaker-name');
+                                    if (nameInput) {
+                                        if (nameInput.value.trim() === bookie1) bookie1Index = index;
+                                        if (nameInput.value.trim() === bookie2) bookie2Index = index;
+                                    }
+                                });
+                                
+                                // Find the team row
+                                let teamRow;
+                                teamRows.forEach(row => {
+                                    const nameInput = row.querySelector('.team-name');
+                                    if (nameInput && nameInput.value.trim() === team) {
+                                        teamRow = row;
+                                    }
+                                });
+                                
+                                if (teamRow && bookie1Index >= 0 && bookie2Index >= 0) {
+                                    odds[team][bookie1] = teamRow.cells[bookie1Index].querySelector('input').value;
+                                    odds[team][bookie2] = teamRow.cells[bookie2Index].querySelector('input').value;
+                                }
+                            });
+                            
+                            // Calculate risk-minimizing strategy for this bookmaker pair
+                            const result = performRiskMinimizingCalculation(teams, odds, bookie1, bookie2, totalAmount);
+                            
+                            if (result.expectedProfit > bestResult.expectedProfit) {
+                                bestResult = result;
+                            }
+                        }
+                    }
+                    
+                    // Generate result HTML for this game
+                    if (bestResult.expectedProfit === -Infinity || !bestResult.isProfitable) {
+                        resultsHTML.push(`
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> ${gameTitle} - No Viable Strategy Found
+                                </div>
+                                <p>No viable risk-minimizing strategy found with the current odds.</p>
+                                <p>Try adjusting the odds or adding more bookmakers.</p>
+                            </div>
+                        `);
+                    } else {
+                        const originalStableOdds = getOriginalOdds(spreadsheet, bestResult.stableTeam, bestResult.stableBookie);
+                        const originalRiskierOdds = getOriginalOdds(spreadsheet, bestResult.riskierTeam, bestResult.riskierBookie);
+                        
+                        resultsHTML.push(`
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-trophy"></i> ${gameTitle} - Optimal Risk-Minimizing Strategy
+                                </div>
+                                <div class="strategy-type">
+                                    <i class="fas fa-shield-alt"></i> Risk-Minimizing Strategy
+                                </div>
+                                <p>Total amount: <span class="highlight">£${totalAmount.toFixed(2)}</span></p>
+                                
+                                <div class="result-details">
+                                    <div class="result-box">
+                                        <div class="result-label">Stake on ${bestResult.stableTeam} (Stable Bet)</div>
+                                        <div class="result-value">£${bestResult.stableStake.toFixed(2)}</div>
+                                        <div class="result-label">at ${bestResult.stableBookie} (odds: ${originalStableOdds})</div>
+                                    </div>
+                                    
+                                    <div class="result-box">
+                                        <div class="result-label">Stake on ${bestResult.riskierTeam} (Hedge Bet)</div>
+                                        <div class="result-value">£${bestResult.riskierStake.toFixed(2)}</div>
+                                        <div class="result-label">at ${bestResult.riskierBookie} (odds: ${originalRiskierOdds})</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="scenario">
+                                    <div class="scenario-title">
+                                        <i class="fas fa-check-circle"></i> If ${bestResult.stableTeam} wins:
+                                    </div>
+                                    <p>Profit = <span class="highlight">£${bestResult.expectedProfit.toFixed(2)}</span></p>
+                                </div>
+                                
+                                <div class="scenario">
+                                    <div class="scenario-title">
+                                        <i class="fas fa-check-circle"></i> If ${bestResult.riskierTeam} wins:
+                                    </div>
+                                    <p>Result = <span class="highlight ${bestResult.riskierResult >= 0 ? '' : 'break-even'}">
+                                    £${bestResult.riskierResult.toFixed(2)}</span> 
+                                    ${bestResult.riskierResult > 0 ? '(small profit)' : '(break-even)'}</p>
+                                </div>
+                            </div>
+                        `);
+                    }
+                });
+                
+                // Display results
+                resultsContent.innerHTML = resultsHTML.join('');
+                resultsContainer.style.display = 'block';
+                
+                // Scroll to results
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Helper function to get original odds string
+            function getOriginalOdds(spreadsheet, teamName, bookieName) {
+                // Find the bookmaker column
+                const headerRow = spreadsheet.querySelector('thead tr');
+                const headers = Array.from(headerRow.querySelectorAll('th'));
+                let bookieIndex = -1;
+                
+                headers.forEach((th, index) => {
+                    const nameInput = th.querySelector('.bookmaker-name');
+                    if (nameInput && nameInput.value.trim() === bookieName) {
+                        bookieIndex = index;
+                    }
+                });
+                
+                if (bookieIndex < 0) return '';
+                
+                // Find the team row
+                const teamRows = spreadsheet.querySelectorAll('tbody tr');
+                let teamRow;
+                
+                teamRows.forEach(row => {
+                    const nameInput = row.querySelector('.team-name');
+                    if (nameInput && nameInput.value.trim() === teamName) {
+                        teamRow = row;
+                    }
+                });
+                
+                if (!teamRow) return '';
+                
+                // Get the odds
+                const oddsInput = teamRow.cells[bookieIndex].querySelector('input');
+                return oddsInput ? oddsInput.value : '';
+            }
+            
+            // Add copyright with current year
+            document.querySelector('footer p').textContent = `BetCalc Pro © ${new Date().getFullYear()} | Last updated: 2025-06-09`;
+        });
+    </script>
+</body>
+</html>
