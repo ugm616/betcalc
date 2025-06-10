@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetCalc Pro - Advanced Betting Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #f0f0f0;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            border: 1px solid #3a3a6a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(76, 175, 80, 0.1), transparent);
+            pointer-events: none;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            color: #4CAF50;
+            text-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+            position: relative;
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .pro-badge {
+            background: linear-gradient(45deg, #ff8a00, #ff2070);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-left: 10px;
+            vertical-align: middle;
+            text-shadow: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #3a3a6a;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .total-amount-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(42, 42, 72, 0.7);
+            padding: 10px 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .total-amount-control label {
+            font-weight: bold;
+            color: #4CAF50;
+            white-space: nowrap;
+            font-size: 1rem;
+        }
+        
+        .total-amount-control input {
+            width: 110px;
+            padding: 8px 12px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+        }
+        
+        .toggle-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            white-space: nowrap;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 22px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 22px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .bet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .bet-form {
+            background: rgba(34, 34, 60, 0.9);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border-left: 5px solid #4CAF50;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bet-form::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .bet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a3a6a;
+            position: relative;
+        }
+        
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .team-names {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .team-input {
+            flex: 1;
+        }
+        
+        .team-input label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        .team-input input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .game-amount {
+            width: 140px;
+        }
+        
+        .game-amount label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        .game-amount input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .bookmaker-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .bookmaker-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .bookmaker-item {
+            background: rgba(42, 42, 72, 0.7);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .bookmaker-item .remove-bookmaker {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+        }
+        
+        .odds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        
+        .odds-table th {
+            background-color: #2c2c4c;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #ddd;
+            position: sticky;
+            top: 0;
+        }
+        
+        .odds-table td {
+            padding: 10px 12px;
+            background-color: rgba(42, 42, 72, 0.7);
+            border-bottom: 1px solid #3a3a6a;
+        }
+        
+        .bookmaker-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .team-name-input {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+        
+        .team-name-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+        }
+        
+        .odds-input {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+        }
+        
+        .odds-input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 8px rgba(33, 150, 243, 0.6);
+        }
+        
+        .bookmaker-name-input {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .bookmaker-name-input:focus {
+            outline: none;
+            border-color: #FF9800;
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.6);
+        }
+        
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .btn-tertiary {
+            background: linear-gradient(to right, #FF9800, #F57C00);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #f44336, #D32F2F);
+            color: white;
+        }
+        
+        .btn-print {
+            background: linear-gradient(to right, #9C27B0, #7B1FA2);
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+            border: 1px solid #3a3a6a;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #4CAF50;
+            margin-bottom: 12px;
+        }
+        
+        .modal-message {
+            color: #ddd;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+        
+        .results-container {
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid #3a3a6a;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-title {
+            font-size: 1.6rem;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .print-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .bet-result {
+            background: rgba(34, 34, 60, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4CAF50;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bet-result::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .result-header {
+            color: #4CAF50;
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a3a6a;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+        
+        .result-box {
+            background: rgba(42, 42, 72, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .result-label {
+            font-size: 0.95rem;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+        
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .scenario {
+            margin-top: 18px;
+            padding: 15px;
+            background: rgba(42, 42, 72, 0.7);
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2196F3;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .profit-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .profit-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .highlight {
+            background-color: rgba(76, 175, 80, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .remove-bet {
+            margin-top: 12px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+        }
+
+        .delete-bookmaker {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 5px;
+        }
+        
+        footer {
+            height: 50px;
+            margin-top: 30px;
+        }
+        
+        /* Printable versions */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+                font-size: 11pt;
+                line-height: 1.4;
+            }
+            
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            header, .controls, .btn-container, .remove-bet, .print-buttons, footer {
+                display: none;
+            }
+            
+            .results-container {
+                display: block !important;
+                box-shadow: none;
+                border: none;
+                background: white !important;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .bet-result, .result-box, .scenario {
+                box-shadow: none;
+                border: none !important;
+                background: white !important;
+                color: black !important;
+                page-break-inside: avoid;
+                padding: 5px 0;
+                margin-bottom: 15px;
+            }
+            
+            .result-value, .scenario-title, .result-header, .highlight {
+                color: black !important;
+                background: white !important;
+            }
+            
+            .highlight {
+                padding: 0;
+                font-weight: bold;
+            }
+            
+            /* Hide all icons */
+            i.fas {
+                display: none;
+            }
+            
+            /* Headings */
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: bold;
+                color: black;
+                font-size: 13pt;
+            }
+            
+            .result-header {
+                border-bottom: 1px solid black !important;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+                font-size: 12pt;
+            }
+            
+            .scenario-title {
+                border-bottom: 1px solid black !important;
+                color: black !important;
+                padding-bottom: 3px;
+                margin-bottom: 8px;
+                font-size: 11pt;
+            }
+            
+            .result-details, .profit-details {
+                display: block !important;
+                margin-bottom: 10px;
+            }
+            
+            .result-box {
+                padding: 5px 0;
+                margin-bottom: 8px;
+                page-break-inside: avoid;
+            }
+            
+            .result-label {
+                font-weight: bold;
+                color: black;
+                font-size: 10pt;
+                margin-bottom: 2px;
+            }
+            
+            .result-value {
+                font-size: 11pt;
+                font-weight: normal;
+            }
+            
+            .scenario {
+                padding: 5px 0;
+                margin-top: 10px;
+                border-left: none !important;
+            }
+            
+            .profit-item {
+                background: white !important;
+                padding: 3px 0;
+                margin-bottom: 5px;
+            }
+            
+            /* Bookmakers summary */
+            .bookmakers-summary {
+                page-break-before: always;
+                margin-top: 30px;
+            }
+            
+            .bookmakers-summary h2 {
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+                margin-bottom: 15px;
+            }
+            
+            .bookmaker {
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+            }
+            
+            .bookmaker h3 {
+                margin: 10px 0 5px;
+                font-size: 11pt;
+            }
+            
+            .bookmaker-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 10pt;
+            }
+            
+            .bookmaker-table th {
+                text-align: left;
+                border-bottom: 1px solid #000;
+                padding: 3px 0;
+                font-weight: bold;
+            }
+            
+            .bookmaker-table td {
+                padding: 3px 0;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .bookmaker-table .total-row {
+                font-weight: bold;
+                border-top: 1px solid #000;
+            }
+            
+            .profit-summary {
+                margin-top: 30px;
+                page-break-before: always;
+            }
+            
+            .profit-summary h2 {
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .profit-summary p {
+                margin: 8px 0;
+                font-size: 10.5pt;
+            }
+            
+            .profit-summary .total-row {
+                font-weight: bold;
+                margin-top: 10px;
+                font-size: 11pt;
+            }
+            
+            /* Hide game results and other sections for bet sheet */
+            .results-content {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 1100px) {
+            .bet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .print-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .team-names {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .total-amount-control {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .toggle-container {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .bet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
+            
+            .game-amount {
+                width: 100%;
+            }
+            
+            .team-names {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BetCalc <span class="pro-badge">PRO</span></h1>
+            <p class="subtitle">Advanced betting calculator with multi-bookmaker support and detailed reporting</p>
+        </header>
+        
+        <div class="controls">
+            <div class="total-amount-control">
+                <label for="total-amount">Total Amount (£):</label>
+                <input type="number" id="total-amount" min="1" value="1000">
+                <div class="toggle-container">
+                    <div class="toggle-label">Auto Distribute</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-distribute" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button id="add-bet" class="btn-secondary">
+                    <i class="fas fa-plus-circle"></i> Add Game
+                </button>
+                <button id="add-bookmaker" class="btn-tertiary">
+                    <i class="fas fa-book"></i> Add Bookmaker
+                </button>
+                <button id="calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Calculate Strategy
+                </button>
+            </div>
+        </div>
+        
+        <div class="bet-grid" id="bet-forms">
+            <!-- Bet forms will be added here -->
+        </div>
+            
+        <div id="results" class="results-container">
+            <div class="results-header">
+                <h2 class="results-title">
+                    <i class="fas fa-chart-line"></i> Optimal Betting Strategy
+                </h2>
+                <div class="print-buttons">
+                    <button id="print-summary" class="btn-print">
+                        <i class="fas fa-file-alt"></i> Print Bet Sheet
+                    </button>
+                    <button id="print-detail" class="btn-print">
+                        <i class="fas fa-file-invoice"></i> Print Detailed
+                    </button>
+                </div>
+            </div>
+            <div id="results-content">
+                <!-- Results will be displayed here -->
+            </div>
+            <div id="bookmakers-summary" class="bookmakers-summary"></div>
+            <div id="profit-summary" class="profit-summary"></div>
+        </div>
+        
+        <footer>
+            <!-- Empty footer for future editing -->
+        </footer>
+    </div>
+    
+    <!-- Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-check-circle"></i> Confirm Calculation</h3>
+            </div>
+            <p class="modal-message">Are you sure you want to calculate the betting strategy with the current odds? You can go back to adjust if needed.</p>
+            <div class="modal-buttons">
+                <button id="confirm-calculate" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Yes, Calculate
+                </button>
+                <button id="cancel-calculate" class="btn-danger">
+                    <i class="fas fa-times"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const betForms = document.getElementById('bet-forms');
+            const addBetBtn = document.getElementById('add-bet');
+            const addBookmakerBtn = document.getElementById('add-bookmaker');
+            const calculateBtn = document.getElementById('calculate');
+            const modal = document.getElementById('confirmation-modal');
+            const confirmBtn = document.getElementById('confirm-calculate');
+            const cancelBtn = document.getElementById('cancel-calculate');
+            const resultsContainer = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            const printSummaryBtn = document.getElementById('print-summary');
+            const printDetailBtn = document.getElementById('print-detail');
+            const totalAmountInput = document.getElementById('total-amount');
+            const autoDistributeToggle = document.getElementById('auto-distribute');
+            const bookmakersSummary = document.getElementById('bookmakers-summary');
+            const profitSummary = document.getElementById('profit-summary');
+            
+            let bookmakers = [
+                { id: 1, name: "Bet365" },
+                { id: 2, name: "William Hill" }
+            ];
+            
+            let lastResults = [];
+            
+            // Create initial bet form
+            createBetForm(1);
+            
+            // Add new bet form
+            addBetBtn.addEventListener('click', function() {
+                const formCount = document.querySelectorAll('.bet-form').length + 1;
+                createBetForm(formCount);
+                if (autoDistributeToggle.checked) {
+                    distributeTotalAmount();
+                }
+            });
+            
+            // Add new bookmaker
+            addBookmakerBtn.addEventListener('click', function() {
+                const newId = bookmakers.length > 0 ? Math.max(...bookmakers.map(b => b.id)) + 1 : 1;
+                const newName = `Bookmaker ${newId}`;
+                bookmakers.push({ id: newId, name: newName });
+                
+                // Update all existing forms
+                document.querySelectorAll('.bet-form').forEach((form, index) => {
+                    updateBookmakerColumns(form, index);
+                });
+            });
+            
+            // Total amount input change
+            totalAmountInput.addEventListener('input', function() {
+                if (autoDistributeToggle.checked) {
+                    distributeTotalAmount();
+                }
+            });
+            
+            // Auto distribute toggle
+            autoDistributeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    distributeTotalAmount();
+                }
+            });
+            
+            // Show confirmation modal
+            calculateBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            // Cancel calculation
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Confirm calculation
+            confirmBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                calculateStrategy();
+            });
+            
+            // Print summary
+            printSummaryBtn.addEventListener('click', function() {
+                generatePrintableReport('bet-sheet');
+                setTimeout(() => {
+                    window.print();
+                }, 100);
+            });
+            
+            // Print detailed
+            printDetailBtn.addEventListener('click', function() {
+                generatePrintableReport('detail');
+                setTimeout(() => {
+                    window.print();
+                }, 100);
+            });
+            
+            // Distribute total amount equally among games
+            function distributeTotalAmount() {
+                const totalAmount = parseFloat(totalAmountInput.value) || 0;
+                const gameCount = document.querySelectorAll('.bet-form').length;
+                
+                if (gameCount > 0 && totalAmount > 0) {
+                    const amountPerGame = totalAmount / gameCount;
+                    
+                    document.querySelectorAll('.bet-form').forEach((form, index) => {
+                        const amountInput = form.querySelector(`.game-amount input`);
+                        if (amountInput) {
+                            amountInput.value = amountPerGame.toFixed(2);
+                        }
+                    });
+                }
+            }
+            
+            // Function to delete a bookmaker from the system
+            function deleteBookmaker(id) {
+                const index = bookmakers.findIndex(b => b.id === id);
+                if (index !== -1) {
+                    bookmakers.splice(index, 1);
+                    
+                    // Update all existing forms to remove this bookmaker
+                    document.querySelectorAll('.bet-form').forEach(form => {
+                        updateBookmakerColumns(form, form.dataset.index);
+                    });
+                }
+            }
+            
+            // Create a bet form
+            function createBetForm(index) {
+                const betForm = document.createElement('div');
+                betForm.className = 'bet-form';
+                betForm.dataset.index = index;
+                
+                let bookmakerRows = '';
+                bookmakers.forEach((bookmaker, idx) => {
+                    bookmakerRows += `
+                        <tr>
+                            <td>
+                                <div class="bookmaker-name-cell">
+                                    <input type="text" class="bookmaker-name-input" value="${bookmaker.name}" 
+                                           placeholder="Bookmaker name" data-id="${bookmaker.id}">
+                                    <button class="delete-bookmaker" data-id="${bookmaker.id}" title="Delete this bookmaker">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td><input type="text" class="odds-input" placeholder="e.g., 2/1"></td>
+                            <td><input type="text" class="odds-input" placeholder="e.g., 4/1"></td>
+                        </tr>
+                    `;
+                });
+                
+                betForm.innerHTML = `
+                    <div class="bet-header">
+                        <div class="game-title">
+                            <i class="fas fa-hockey-puck"></i> Game #${index}
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <div class="team-names">
+                            <div class="team-input">
+                                <label>Team A Name</label>
+                                <input type="text" class="team-name-input teamA-name" value="TeamA" placeholder="Enter team name">
+                            </div>
+                            <div class="team-input">
+                                <label>Team B Name</label>
+                                <input type="text" class="team-name-input teamB-name" value="TeamB" placeholder="Enter team name">
+                            </div>
+                        </div>
+                        <div class="game-amount">
+                            <label>Amount (£)</label>
+                            <input type="number" class="game-amount-input" min="1" value="${autoDistributeToggle.checked ? (parseFloat(totalAmountInput.value) / document.querySelectorAll('.bet-form').length || 100) : 100}">
+                        </div>
+                    </div>
+                    
+                    <div class="bookmaker-controls">
+                        <h3>Bookmakers</h3>
+                    </div>
+                    
+                    <table class="odds-table">
+                        <thead>
+                            <tr>
+                                <th>Bookmaker</th>
+                                <th class="teamA-header">TeamA Odds</th>
+                                <th class="teamB-header">TeamB Odds</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${bookmakerRows}
+                        </tbody>
+                    </table>
+                    <button class="btn-danger remove-bet">
+                        <i class="fas fa-trash-alt"></i> Remove Game
+                    </button>
+                `;
+                betForms.appendChild(betForm);
+                
+                // Add event listeners for team name changes
+                const teamAInput = betForm.querySelector('.teamA-name');
+                const teamBInput = betForm.querySelector('.teamB-name');
+                
+                teamAInput.addEventListener('input', function() {
+                    updateTeamHeaders(betForm);
+                });
+                
+                teamBInput.addEventListener('input', function() {
+                    updateTeamHeaders(betForm);
+                });
+                
+                // Initialize headers
+                updateTeamHeaders(betForm);
+                
+                // Add event listener to remove button
+                betForm.querySelector('.remove-bet').addEventListener('click', function() {
+                    if (document.querySelectorAll('.bet-form').length > 1) {
+                        betForm.remove();
+                        // Update game numbers
+                        document.querySelectorAll('.bet-form').forEach((form, idx) => {
+                            const title = form.querySelector('.game-title');
+                            if (title) {
+                                title.innerHTML = `<i class="fas fa-hockey-puck"></i> Game #${idx + 1}`;
+                            }
+                        });
+                        
+                        if (autoDistributeToggle.checked) {
+                            distributeTotalAmount();
+                        }
+                    } else {
+                        alert('You need at least one game!');
+                    }
+                });
+                
+                // Add event listeners to bookmaker name inputs
+                betForm.querySelectorAll('.bookmaker-name-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const newName = this.value;
+                        const bookmaker = bookmakers.find(b => b.id === id);
+                        if (bookmaker) {
+                            bookmaker.name = newName;
+                        }
+                    });
+                });
+                
+                // Add event listeners to delete bookmaker buttons
+                betForm.querySelectorAll('.delete-bookmaker').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        deleteBookmaker(id);
+                    });
+                });
+                
+                // Add event listener to game amount input
+                const gameAmountInput = betForm.querySelector('.game-amount-input');
+                gameAmountInput.addEventListener('input', function() {
+                    if (!autoDistributeToggle.checked) {
+                        // If auto-distribute is off, update the total amount to reflect the sum of all games
+                        updateTotalAmount();
+                    }
+                });
+            }
+            
+            // Update team headers based on input values
+            function updateTeamHeaders(form) {
+                const teamA = form.querySelector('.teamA-name').value || 'TeamA';
+                const teamB = form.querySelector('.teamB-name').value || 'TeamB';
+                
+                const teamAHeader = form.querySelector('.teamA-header');
+                const teamBHeader = form.querySelector('.teamB-header');
+                
+                if (teamAHeader) teamAHeader.textContent = `${teamA} Odds`;
+                if (teamBHeader) teamBHeader.textContent = `${teamB} Odds`;
+            }
+            
+            // Update total amount based on individual game amounts
+            function updateTotalAmount() {
+                let total = 0;
+                document.querySelectorAll('.game-amount-input').forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+                totalAmountInput.value = total.toFixed(2);
+            }
+            
+            // Update bookmaker columns in a form
+            function updateBookmakerColumns(form, index) {
+                let bookmakerRows = '';
+                bookmakers.forEach((bookmaker, idx) => {
+                    bookmakerRows += `
+                        <tr>
+                            <td>
+                                <div class="bookmaker-name-cell">
+                                    <input type="text" class="bookmaker-name-input" value="${bookmaker.name}" 
+                                           placeholder="Bookmaker name" data-id="${bookmaker.id}">
+                                    <button class="delete-bookmaker" data-id="${bookmaker.id}" title="Delete this bookmaker">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td><input type="text" class="odds-input" placeholder="e.g., 2/1"></td>
+                            <td><input type="text" class="odds-input" placeholder="e.g., 4/1"></td>
+                        </tr>
+                    `;
+                });
+                
+                const tableHTML = `
+                    <table class="odds-table">
+                        <thead>
+                            <tr>
+                                <th>Bookmaker</th>
+                                <th class="teamA-header">TeamA Odds</th>
+                                <th class="teamB-header">TeamB Odds</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${bookmakerRows}
+                        </tbody>
+                    </table>
+                `;
+                
+                const existingTable = form.querySelector('.odds-table');
+                if (existingTable) {
+                    existingTable.outerHTML = tableHTML;
+                }
+                
+                // Update team headers
+                updateTeamHeaders(form);
+                
+                // Reattach event listeners
+                form.querySelectorAll('.bookmaker-name-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const newName = this.value;
+                        const bookmaker = bookmakers.find(b => b.id === id);
+                        if (bookmaker) {
+                            bookmaker.name = newName;
+                        }
+                    });
+                });
+                
+                // Reattach delete bookmaker event listeners
+                form.querySelectorAll('.delete-bookmaker').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        deleteBookmaker(id);
+                    });
+                });
+            }
+            
+            // Calculate the optimal betting strategy
+            function calculateStrategy() {
+                const betForms = document.querySelectorAll('.bet-form');
+                let resultsHTML = '';
+                lastResults = [];
+                
+                betForms.forEach((form, index) => {
+                    // Get amount for this game
+                    const amountInput = form.querySelector('.game-amount-input');
+                    const totalAmount = amountInput ? parseFloat(amountInput.value) : 100;
+                    
+                    // Get team names
+                    const teamA = form.querySelector('.teamA-name').value || 'TeamA';
+                    const teamB = form.querySelector('.teamB-name').value || 'TeamB';
+                    
+                    // Get bookmakers data
+                    const bookmakerInputs = form.querySelectorAll('tbody tr');
+                    const bookmakerData = [];
+                    
+                    bookmakerInputs.forEach((row, idx) => {
+                        const nameInput = row.querySelector('.bookmaker-name-input');
+                        const oddsInputs = row.querySelectorAll('.odds-input');
+                        
+                        if (nameInput && oddsInputs.length >= 2) {
+                            const name = nameInput.value;
+                            const oddsA = oddsInputs[0].value;
+                            const oddsB = oddsInputs[1].value;
+                            
+                            if (oddsA && oddsB) {
+                                try {
+                                    const [a1, b1] = oddsA.split('/').map(Number);
+                                    const [c1, d1] = oddsB.split('/').map(Number);
+                                    
+                                    // Convert to decimal odds (including the stake)
+                                    const decimalA = (a1 / b1) + 1;
+                                    const decimalB = (c1 / d1) + 1;
+                                    
+                                    bookmakerData.push({
+                                        name,
+                                        oddsA: decimalA,
+                                        oddsB: decimalB,
+                                        displayA: oddsA,
+                                        displayB: oddsB
+                                    });
+                                } catch (e) {
+                                    console.error("Invalid odds format", e);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Validate inputs
+                    if (bookmakerData.length < 2) {
+                        resultsHTML += `
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> Game #${index + 1} Error
+                                </div>
+                                <p>Please enter valid odds for at least two bookmakers</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Find best odds for each team
+                    let bestOddsA = {value: 0, bookmaker: null};
+                    let bestOddsB = {value: 0, bookmaker: null};
+                    
+                    bookmakerData.forEach(bookmaker => {
+                        if (bookmaker.oddsA > bestOddsA.value) {
+                            bestOddsA = {value: bookmaker.oddsA, bookmaker};
+                        }
+                        if (bookmaker.oddsB > bestOddsB.value) {
+                            bestOddsB = {value: bookmaker.oddsB, bookmaker};
+                        }
+                    });
+                    
+                    // Determine favorite and underdog based on odds
+                    const isTeamAFavorite = bestOddsA.value <= bestOddsB.value;
+                    const favorite = isTeamAFavorite ? teamA : teamB;
+                    const underdog = isTeamAFavorite ? teamB : teamA;
+                    const favoriteOdds = isTeamAFavorite ? bestOddsA : bestOddsB;
+                    const underdogOdds = isTeamAFavorite ? bestOddsB : bestOddsA;
+                    
+                    // Calculate stakes
+                    const stakeUnderdog = totalAmount / underdogOdds.value;
+                    const stakeFavorite = totalAmount - stakeUnderdog;
+                    
+                    // Calculate profits
+                    const profitFavorite = stakeFavorite * favoriteOdds.value - totalAmount;
+                    const profitUnderdog = stakeUnderdog * underdogOdds.value - totalAmount;
+                    
+                    // Ensure we don't lose money
+                    if (profitUnderdog < 0) {
+                        resultsHTML += `
+                            <div class="bet-result">
+                                <div class="result-header">
+                                    <i class="fas fa-exclamation-triangle"></i> Game #${index + 1} Error
+                                </div>
+                                <p>No risk-free strategy found. Odds don't allow breaking even on underdog win.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Store for printable report
+                    lastResults.push({
+                        gameIndex: index + 1,
+                        teamA,
+                        teamB,
+                        favorite,
+                        underdog,
+                        stakeFavorite,
+                        stakeUnderdog,
+                        bookmakerFavorite: {
+                            name: favoriteOdds.bookmaker.name,
+                            display: isTeamAFavorite ? favoriteOdds.bookmaker.displayA : favoriteOdds.bookmaker.displayB
+                        },
+                        bookmakerUnderdog: {
+                            name: underdogOdds.bookmaker.name,
+                            display: isTeamAFavorite ? underdogOdds.bookmaker.displayB : underdogOdds.bookmaker.displayA
+                        },
+                        profitFavorite,
+                        profitUnderdog,
+                        totalAmount,
+                        favoriteOdds: favoriteOdds.value,
+                        underdogOdds: underdogOdds.value
+                    });
+                    
+                    // Generate results HTML
+                    resultsHTML += `
+                        <div class="bet-result">
+                            <div class="result-header">
+                                <i class="fas fa-trophy"></i> Game #${index + 1} Strategy: ${teamA} vs ${teamB}
+                            </div>
+                            
+                            <div class="result-details">
+                                <div class="result-box">
+                                    <div class="result-label">Bet on ${favorite} (Fav)</div>
+                                    <div class="result-value">£${stakeFavorite.toFixed(2)}</div>
+                                    <div class="result-label">at ${favoriteOdds.bookmaker.name} (${isTeamAFavorite ? favoriteOdds.bookmaker.displayA : favoriteOdds.bookmaker.displayB})</div>
+                                </div>
+                                
+                                <div class="result-box">
+                                    <div class="result-label">Bet on ${underdog} (Underdog)</div>
+                                    <div class="result-value">£${stakeUnderdog.toFixed(2)}</div>
+                                    <div class="result-label">at ${underdogOdds.bookmaker.name} (${isTeamAFavorite ? underdogOdds.bookmaker.displayB : underdogOdds.bookmaker.displayA})</div>
+                                </div>
+                                
+                                <div class="result-box">
+                                    <div class="result-label">Total Investment</div>
+                                    <div class="result-value">£${totalAmount.toFixed(2)}</div>
+                                </div>
+                                
+                                <div class="result-box">
+                                    <div class="result-label">Max Profit Potential</div>
+                                    <div class="result-value">£${Math.max(profitFavorite, profitUnderdog).toFixed(2)}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="scenario">
+                                <div class="scenario-title">
+                                    <i class="fas fa-check-circle"></i> If ${favorite} Wins (Expected):
+                                </div>
+                                <p>Profit = (${stakeFavorite.toFixed(2)} × ${isTeamAFavorite ? favoriteOdds.bookmaker.displayA : favoriteOdds.bookmaker.displayB}) - ${stakeUnderdog.toFixed(2)} = <span class="highlight">£${profitFavorite.toFixed(2)}</span></p>
+                                
+                                <div class="profit-details">
+                                    <div class="profit-item">
+                                        <div class="result-label">Gross Return</div>
+                                        <div class="result-value">£${(stakeFavorite * favoriteOdds.value).toFixed(2)}</div>
+                                    </div>
+                                    <div class="profit-item">
+                                        <div class="result-label">Investment</div>
+                                        <div class="result-value">£${totalAmount.toFixed(2)}</div>
+                                    </div>
+                                    <div class="profit-item">
+                                        <div class="result-label">Net Profit</div>
+                                        <div class="result-value">£${profitFavorite.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="scenario">
+                                <div class="scenario-title">
+                                    <i class="fas fa-check-circle"></i> If ${underdog} Wins:
+                                </div>
+                                <p>Profit = (${stakeUnderdog.toFixed(2)} × ${isTeamAFavorite ? underdogOdds.bookmaker.displayB : underdogOdds.bookmaker.displayA}) - ${stakeFavorite.toFixed(2)} = <span class="highlight">£${profitUnderdog.toFixed(2)}</span></p>
+                                
+                                <div class="profit-details">
+                                    <div class="profit-item">
+                                        <div class="result-label">Gross Return</div>
+                                        <div class="result-value">£${(stakeUnderdog * underdogOdds.value).toFixed(2)}</div>
+                                    </div>
+                                    <div class="profit-item">
+                                        <div class="result-label">Investment</div>
+                                        <div class="result-value">£${totalAmount.toFixed(2)}</div>
+                                    </div>
+                                    <div class="profit-item">
+                                        <div class="result-label">Net Profit</div>
+                                        <div class="result-value">£${profitUnderdog.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // Display results
+                resultsContent.innerHTML = resultsHTML;
+                resultsContainer.style.display = 'block';
+                
+                // Scroll to results
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Generate printable report
+            function generatePrintableReport(type = 'detail') {
+                if (lastResults.length === 0) return;
+                
+                // Calculate maximum profit values
+                let maxGrossProfit = 0;
+                let maxNetProfit = 0;
+                
+                lastResults.forEach(result => {
+                    // Calculate both scenarios for each game
+                    const grossProfitFavorite = result.stakeFavorite * result.favoriteOdds;
+                    const grossProfitUnderdog = result.stakeUnderdog * result.underdogOdds;
+                    const netProfitFavorite = result.profitFavorite;
+                    const netProfitUnderdog = result.profitUnderdog;
+
+                    // Take the maximum values for each game
+                    maxGrossProfit += Math.max(grossProfitFavorite, grossProfitUnderdog);
+                    maxNetProfit += Math.max(netProfitFavorite, netProfitUnderdog);
+                });
+                
+                // Bookmakers summary
+                let bookmakersHTML = '<h2>Bookmakers List</h2>';
+                const bookmakerBets = {};
+                
+                // Group bets by bookmaker
+                lastResults.forEach(result => {
+                    // Favorite bet
+                    if (!bookmakerBets[result.bookmakerFavorite.name]) {
+                        bookmakerBets[result.bookmakerFavorite.name] = [];
+                    }
+                    bookmakerBets[result.bookmakerFavorite.name].push({
+                        game: `Game ${result.gameIndex}: ${result.teamA} vs ${result.teamB}`,
+                        team: result.favorite,
+                        amount: result.stakeFavorite
+                    });
+                    
+                    // Underdog bet
+                    if (!bookmakerBets[result.bookmakerUnderdog.name]) {
+                        bookmakerBets[result.bookmakerUnderdog.name] = [];
+                    }
+                    bookmakerBets[result.bookmakerUnderdog.name].push({
+                        game: `Game ${result.gameIndex}: ${result.teamA} vs ${result.teamB}`,
+                        team: result.underdog,
+                        amount: result.stakeUnderdog
+                    });
+                });
+                
+                // Generate bookmaker tables
+                for (const bookmaker in bookmakerBets) {
+                    bookmakersHTML += `<div class="bookmaker"><h3>${bookmaker}</h3>`;
+                    bookmakersHTML += '<table class="bookmaker-table">';
+                    bookmakersHTML += '<thead><tr><th>Game</th><th>Team</th><th>Amount (£)</th></tr></thead><tbody>';
+                    
+                    let bookmakerTotal = 0;
+                    bookmakerBets[bookmaker].forEach(bet => {
+                        bookmakersHTML += `<tr><td>${bet.game}</td><td>${bet.team}</td><td>${bet.amount.toFixed(2)}</td></tr>`;
+                        bookmakerTotal += bet.amount;
+                    });
+                    
+                    bookmakersHTML += `<tr class="total-row"><td colspan="2">Total</td><td>${bookmakerTotal.toFixed(2)}</td></tr>`;
+                    bookmakersHTML += '</tbody></table></div>';
+                }
+                
+                bookmakersSummary.innerHTML = bookmakersHTML;
+                
+                // Profit summary - different based on report type
+                if (type === 'bet-sheet') {
+                    profitSummary.innerHTML = `
+                        <h2>Profit Summary</h2>
+                        <p>Maximum Gross Profit: £${maxGrossProfit.toFixed(2)}</p>
+                        <p>Maximum Net Profit: £${maxNetProfit.toFixed(2)}</p>
+                    `;
+                } else {
+                    // Detailed profit summary
+                    let totalInvestment = 0;
+                    let totalGrossProfitFavorite = 0;
+                    let totalNetProfitFavorite = 0;
+                    let totalGrossProfitUnderdog = 0;
+                    let totalNetProfitUnderdog = 0;
+                    
+                    lastResults.forEach(result => {
+                        totalInvestment += result.totalAmount;
+                        totalGrossProfitFavorite += result.stakeFavorite * result.favoriteOdds;
+                        totalNetProfitFavorite += result.profitFavorite;
+                        totalGrossProfitUnderdog += result.stakeUnderdog * result.underdogOdds;
+                        totalNetProfitUnderdog += result.profitUnderdog;
+                    });
+                    
+                    profitSummary.innerHTML = `
+                        <h2>Profit Summary</h2>
+                        <p>Total Investment: £${totalInvestment.toFixed(2)}</p>
+                        <h3>If All Favorites Win:</h3>
+                        <p>Gross Profit: £${totalGrossProfitFavorite.toFixed(2)}</p>
+                        <p>Net Profit: £${totalNetProfitFavorite.toFixed(2)}</p>
+                        <h3>If All Underdogs Win:</h3>
+                        <p>Gross Profit: £${totalGrossProfitUnderdog.toFixed(2)}</p>
+                        <p>Net Profit: £${totalNetProfitUnderdog.toFixed(2)}</p>
+                        <p class="total-row">Overall Gross Profit: £${(totalGrossProfitFavorite + totalGrossProfitUnderdog).toFixed(2)}</p>
+                        <p class="total-row">Overall Net Profit: £${(totalNetProfitFavorite + totalNetProfitUnderdog).toFixed(2)}</p>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
